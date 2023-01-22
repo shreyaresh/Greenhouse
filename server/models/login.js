@@ -16,18 +16,18 @@ LoginSchema.methods.getUser = async function getUser (user) {
     }
 }
 
-LoginSchema.methods.getEmail = async function getEmail (email) {
+LoginSchema.methods.getEmail = async function getEmail (userEmail) {
     try {
-        return await LoginSchema.findOne({ email: email});
+        return await LoginSchema.findOne({ email: userEmail});
 
     } catch (err) {
         console.log(err);
     }
 }
 
-LoginSchema.methods.verifyStatus = async function verifyStatus (user) {
+LoginSchema.methods.verifyStatus = async function verifyStatus (username) {
     try {
-        const doc = await LoginSchema.findOne({ name: user});
+        const doc = await LoginSchema.findOne({ name: username});
         return doc.isVerified;
     } catch (err) {
         console.log(err);

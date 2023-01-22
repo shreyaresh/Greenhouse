@@ -34,24 +34,43 @@ async function createUser (user) {
   return newUser.save();
 }
 
-function register(req, res) {
-  const user = createUser(req.body);
+async function register(req, res) {
+  const user = await createUser(req.body);
+  console.log("User created successfully.")
   if (!user) {
     res.status(400).send({ err: "User already exists in system." })
   };
+  sendVerifyCode(user.email).then(console.log("Sent code successfully."));
+}
 
+function sendVerifyCode (email) {
   twilioClient.verify.services(serviceSid)
-  .verifications.create({to: user.email, channel: "email"})
+  .verifications.create({to: email, channel: "email"})
   .then(verification => {
     console.log("Verification email sent");
-    res.redirect(`/verify?email=${user.email}`);
+    res.redirect(`/verify?email=${email}`);
   })
   .catch(error => {
     console.log(error);
   });
 }
 
-// login function: redirect to verify if in Login but not verified
+// gets user from DB, or makes a new account if it doesn't exist yet
+function getOrCreateUser(user) {
+  // the "sub" field means "subject", which is a unique identifier for each user
+  return User.findOne({ id: user.sub }).then((existingUser) => {
+    if (existingUser) return existingUser;
+
+    const newUser = new User({
+      name: user.name,
+      id: user.sub,
+      email: user.email
+    });
+
+    return newUser.save();
+  });
+}
+
 
 function verify (req, res){
   const email = req.body.email;
@@ -93,13 +112,32 @@ function verify (req, res){
     };
 
 
-    // TODO: finish login 
-  function loginNormal (req, res) {
-    const email = req.body.email
-    if (!getUser(email)) {res.status(401)}
+  async function loginNormal (req, res) {
+    const user = req.body.username;
+    const userObj = await Login.getUser(user);
+    if (!userObj){
+      (res.status(401).send({err: "User not found"}))
+    }
+    if (userObj && !Login.verifyStatus(user.name)){
+      sendVerifyCode(userObj.email)
+    }
+    
+  const passwordEntry = await argon2.hash(user.password);
+  if (passwordEntry === userObj.password) {
+      try {
+        req.session.user = user;
+        res.send(user);
+      } catch (err) {
+        console.log(err);
+      }
+    }
   }
 
-// google auth
+/*
+
+GOOGLE AUTHENTICATION--USES SEPARATE FUNCTIONS
+
+*/
 
 // create a new OAuth client used to verify google sign-in
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -113,23 +151,6 @@ function verifyGoogle(token) {
       audience: CLIENT_ID,
     })
     .then((ticket) => ticket.getPayload());
-}
-
-
-// gets user from DB, or makes a new account if it doesn't exist yet
-function getOrCreateUser(user) {
-  // the "sub" field means "subject", which is a unique identifier for each user
-  return User.findOne({ id: user.sub }).then((existingUser) => {
-    if (existingUser) return existingUser;
-
-    const newUser = new User({
-      name: user.name,
-      id: user.sub,
-      email: user.email
-    });
-
-    return newUser.save();
-  });
 }
 
 function googleLogin(req, res) {
