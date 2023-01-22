@@ -1,10 +1,29 @@
 const { OAuth2Client } = require("google-auth-library");
 const User = require("./models/user");
 const socketManager = require("./server-socket");
+const sgMail = require('@sendgrid/mail');
+const twilio = require('twilio');
+
+
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const serviceSid = process.env.SERVICE_SID;
+const twilioClient = twilio(accountSid, authToken);
+
+sgMail.setApiKey(SENDGRID_API_KEY)
+
+twilioClient.verify
+  .services(serviceSid) //Put the Verification service SID here
+  .verifications.create({to: "shreyaresh2020@gmail.com", channel: "email"})
+  .then(verification => {
+    console.log(verification.sid);
+  });
+
+// google auth
 
 // create a new OAuth client used to verify google sign-in
-//    TODO: replace with your own CLIENT_ID
-const CLIENT_ID = "FILL IN CLIENT ID";
+const CLIENT_ID = process.env.CLIENT_ID;
 const client = new OAuth2Client(CLIENT_ID);
 
 // accepts a login token from the frontend, and verifies that it's legit
@@ -17,15 +36,17 @@ function verify(token) {
     .then((ticket) => ticket.getPayload());
 }
 
+
 // gets user from DB, or makes a new account if it doesn't exist yet
 function getOrCreateUser(user) {
   // the "sub" field means "subject", which is a unique identifier for each user
-  return User.findOne({ googleid: user.sub }).then((existingUser) => {
+  return User.findOne({ id: user.sub }).then((existingUser) => {
     if (existingUser) return existingUser;
 
     const newUser = new User({
       name: user.name,
-      googleid: user.sub,
+      id: user.sub,
+      email: user.email
     });
 
     return newUser.save();

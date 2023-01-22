@@ -1,0 +1,16 @@
+{
+    "web": {
+            "client_id":"239958526497-k9s3q5out7d1vbcp7h8gie4pl58f1m26.apps.googleusercontent.com",
+            "project_id":"greenhouse-375318",
+            "auth_uri":"https://accounts.google.com/o/oauth2/auth",
+            "token_uri":"https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret":"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",
+            "redirect_uris":["http://greenhouse-game.herokuapp.com/dashboard"],
+            "javascript_origins":[
+                "http://localhost",
+                "http://localhost:3000",
+                "http://greenhouse-game.herokuapp.com"
+            ]
+        }
+}

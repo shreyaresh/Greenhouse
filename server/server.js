@@ -24,6 +24,8 @@ const express = require("express"); // backend framework for our node server.
 const session = require("express-session"); // library that stores info about each connected user
 const mongoose = require("mongoose"); // library to connect to MongoDB
 const path = require("path"); // provide utilities for working with file and directory paths
+const sgMail = require('@sendgrid/mail');
+const twilio = require('twilio');
 
 const api = require("./api");
 const auth = require("./auth");
@@ -31,11 +33,49 @@ const auth = require("./auth");
 // socket stuff
 const socketManager = require("./server-socket");
 
+require('dotenv').config()
 // Server configuration below
 // TODO change connection URL after setting up your team database
-const mongoConnectionURL = "FILL ME IN";
+const mongoConnectionURL = process.env.MONGO_SRV;
 // TODO change database name to the name you chose
-const databaseName = "FILL ME IN";
+const databaseName = "Greenhouse";
+
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+
+sgMail.setApiKey(SENDGRID_API_KEY)
+
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const serviceSid = process.env.SERVICE_SID;
+
+const twilioClient = twilio(accountSid, authToken);
+
+twilioClient.verify
+  .services(serviceSid) //Put the Verification service SID here
+  .verifications.create({to: "shreyaresh2020@gmail.com", channel: "email"})
+  .then(verification => {
+    console.log(verification.sid);
+  });
+
+// const msg = {
+//   to: 'shreyar@mit.edu', // Change to your recipient
+//   from: 'shreyar@mit.edu', // Change to your verified sender
+//   subject: 'Sending with SendGrid is Fun',
+//   text: 'and easy to do anywhere, even with Node.js',
+//   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+// }
+// sgMail
+//   .send(msg)
+//   .then(() => {
+//     console.log('Email sent')
+//   })
+//   .catch((error) => {
+//     console.error(error)
+//   })
+
+
+
 
 // connect to mongodb
 mongoose
@@ -96,7 +136,7 @@ app.use((err, req, res, next) => {
 });
 
 // hardcode port to 3000 for now
-const port = 3000;
+const port =  process.env.PORT || 3000;
 const server = http.Server(app);
 socketManager.init(server);
 
