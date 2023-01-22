@@ -26,13 +26,13 @@ const express = require("express"); // backend framework for our node server.
 const session = require("express-session"); // library that stores info about each connected user
 const mongoose = require("mongoose"); // library to connect to MongoDB
 const path = require("path"); // provide utilities for working with file and directory paths
-
 const api = require("./api");
 const auth = require("./auth");
 
 // socket stuff
 const socketManager = require("./server-socket");
 
+require('dotenv').config()
 // Server configuration below
 // TODO change connection URL after setting up your team database
 const mongoConnectionURL = process.env.MONGO_SRV;
@@ -45,9 +45,12 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     dbName: databaseName,
+    
   })
+  // .then((conn) => conn.connection.db.dropDatabase()) 
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log(`Error connecting to MongoDB: ${err}`));
+
 
 // create a new express server
 const app = express();
@@ -55,6 +58,7 @@ app.use(validator.checkRoutes);
 
 // allow us to process POST requests
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
 
 // set up a session, which will persist login data across requests
 app.use(
@@ -98,7 +102,7 @@ app.use((err, req, res, next) => {
 });
 
 // hardcode port to 3000 for now
-const port = process.env.PORT || 3000;
+const port =  process.env.PORT || 3000;
 const server = http.Server(app);
 socketManager.init(server);
 

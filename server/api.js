@@ -11,6 +11,8 @@ const express = require("express");
 
 // import models so we can interact with the database
 const User = require("./models/user");
+const Login = require("./models/login");
+const Garden = require("./models/garden");
 
 // import authentication library
 const auth = require("./auth");
@@ -21,8 +23,23 @@ const router = express.Router();
 //initialize socket
 const socketManager = require("./server-socket");
 
-router.post("/login", auth.login);
+router.post("/google-login", auth.googleLogin);
+router.post("/register", auth.register);
+router.post("/login", auth.loginNormal);
 router.post("/logout", auth.logout);
+router.post("/verify", auth.verify);
+router.get('/get-verify-code', async (req, res) => {
+    if (await Login.getEmail(req.body.email)) {
+      return res.send(auth.sendVerifyCode(req.body.email));
+    }
+     return res.send({err: "Email is not registered yet."});
+    }
+);
+router.get("/is-verified", async (req, res) => {
+  const doc = await Login.getEmail(req.body.email);
+  return res.send({verified: doc.isVerified});
+});
+
 router.get("/whoami", (req, res) => {
   if (!req.user) {
     // not logged in
