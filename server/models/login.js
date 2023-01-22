@@ -8,36 +8,27 @@ const LoginSchema = new mongoose.Schema({
     isVerified: Boolean 
 });
 
-LoginSchema.methods.getUser = async function getUser (user) {
+LoginSchema.statics.getUser = async function getUser (user) {
     try {
-        return await LoginSchema.findOne({ name: user});
+        return await this.findOne({ name: user});
     } catch (err) {
         console.log(err);
     }
 }
 
-LoginSchema.methods.getEmail = async function getEmail (userEmail) {
+LoginSchema.statics.getEmail = async function getEmail (userEmail) {
     try {
-        return await LoginSchema.findOne({ email: userEmail});
+        return await this.findOne({ email: userEmail});
 
     } catch (err) {
         console.log(err);
     }
 }
 
-LoginSchema.methods.verifyStatus = async function verifyStatus (username) {
+LoginSchema.statics.verifyUser = async function verifyUser (userEmail) {
     try {
-        const doc = await LoginSchema.findOne({ name: username});
-        return doc.isVerified;
-    } catch (err) {
-        console.log(err);
-    }
-} 
-
-LoginSchema.methods.verifyUser = async function verifyUser (userEmail) {
-    try {
-    const doc = await LoginSchema.findOne({ email: userEmail})
-    doc.verifyUser = true;
+    const doc = await this.findOne({ email: userEmail})
+    doc.isVerified = true;
     doc.save();
     } 
     catch (err) {
@@ -45,12 +36,6 @@ LoginSchema.methods.verifyUser = async function verifyUser (userEmail) {
     }
 };
 
-let accessibleInfo = (username, token) => ({user: username, id:token})
-
-LoginSchema.methods.getInfo = async function getId (userEmail) {
-    LoginSchema.findOne({email: userEmail}).then((user) => {
-        return accessibleInfo(user.name, user.emailToken);
-    })
-}
 // compile model from schema
-module.exports = mongoose.model("login", LoginSchema);
+let Login = mongoose.model("login", LoginSchema);
+module.exports = Login;

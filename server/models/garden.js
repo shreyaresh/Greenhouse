@@ -1,17 +1,16 @@
 const mongoose = require("mongoose");
-const Numbers = require("twilio/lib/rest/Numbers");
 
 const Position = new mongoose.Schema({
-        position_x: Numbers,
-        position_y: Numbers,
+        position_x: Number,
+        position_y: Number,
         item_id: String,
-        growthStage: Numbers
+        growthStage: Number
 })
 
 const GardenSchema = new mongoose.Schema({
     gardenId: String,
     userOneId: String,
-    userTwoId, String,
+    userTwoId: String,
     dateCreated: Date,
     lastActive: Date,
     coordinates :[Position]

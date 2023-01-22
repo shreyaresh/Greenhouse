@@ -7,9 +7,10 @@ const UserSchema = new mongoose.Schema({
   email: String,
   gardenIds: [String],
   friends:[String],
-  currency: Numbers,
+  currency: Number,
   inventory: [String]
 });
 
 // compile model from schema
-module.exports = mongoose.model("user", UserSchema);
+let User = mongoose.model("user", UserSchema);
+module.exports = User;

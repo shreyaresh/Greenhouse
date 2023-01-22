@@ -11,6 +11,8 @@ const express = require("express");
 
 // import models so we can interact with the database
 const User = require("./models/user");
+const Login = require("./models/login");
+const Garden = require("./models/garden");
 
 // import authentication library
 const auth = require("./auth");
@@ -22,10 +24,20 @@ const router = express.Router();
 const socketManager = require("./server-socket");
 
 router.post("/google-login", auth.googleLogin);
-router.post("register", auth.register);
+router.post("/register", auth.register);
 router.post("/login", auth.loginNormal);
 router.post("/logout", auth.logout);
-router.post("/verify", auth.verifyNormal);
+router.post("/verify", auth.verify);
+router.get('/get-verify-code', async (req, res) => {
+    console.log(`Request body for getting a new verify code: ${JSON.stringify(req.body)}`);
+    if (await Login.getEmail(req.body.email)) {
+      return res.send(auth.sendVerifyCode(req.body.email));
+    } else {
+    res.send({err: "Email is not registered yet."});
+    }
+  }
+);
+
 router.get("/whoami", (req, res) => {
   if (!req.user) {
     // not logged in

@@ -2,53 +2,60 @@ const { OAuth2Client } = require("google-auth-library");
 const User = require("./models/user");
 const Login = require("./models/login");
 const socketManager = require("./server-socket");
+const user = require("./models/user");
+
+require('dotenv').config()
+
+
 const sgMail = require('@sendgrid/mail');
 const twilio = require('twilio');
 const argon2 = require('argon2');
-const user = require("./models/user");
+const crypto = require('crypto')
 
-
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const serviceSid = process.env.SERVICE_SID;
+const ServiceSid = process.env.SERVICE_SID;
 const twilioClient = twilio(accountSid, authToken);
 
-sgMail.setApiKey(SENDGRID_API_KEY)
 
 
-
-
-async function createUser (user) {
-  if (Login.getUser(user.username)) {return false}
-  if (Login.getEmail(user.email)) {return false}
-  
-  const newUser = Login({
-    name: user.username,
-    email: user.email,
-    emailToken: crypto.randomBytes(64).toString('hex'),
-    password: await argon2.hash(user.password),
-    isVerified: false 
-  });
-
-  return newUser.save();
+async function createlocalUser (user) {
+  console.log(`Request body for user function: ${user}`);
+  if (await Login.getUser(user.username)){
+    return false;
+  } else if (await Login.getEmail(user.email)){ 
+    return false;
+  } else {  
+    const newUser = Login({
+      name: user.username,
+      email: user.email,
+      emailToken: crypto.randomBytes(64).toString('hex'),
+      password: await argon2.hash(user.password),
+      isVerified: false 
+    });
+    return newUser.save();
+  }
 }
 
 async function register(req, res) {
-  const user = await createUser(req.body);
-  console.log("User created successfully.")
+  const user = await createlocalUser(req.body);
+  console.log(user);
   if (!user) {
     res.status(400).send({ err: "User already exists in system." })
-  };
-  sendVerifyCode(user.email).then(console.log("Sent code successfully."));
+  } else {;
+  console.log("User created successfully.")
+  if (sendVerifyCode(user.email)){res.redirect(`/verify?email=${user.email}`);}
+  }
 }
 
+// sends the code to the email
 function sendVerifyCode (email) {
-  twilioClient.verify.services(serviceSid)
+  twilioClient.verify.services(ServiceSid)
   .verifications.create({to: email, channel: "email"})
   .then(verification => {
     console.log("Verification email sent");
-    res.redirect(`/verify?email=${email}`);
+    return true;
   })
   .catch(error => {
     console.log(error);
@@ -63,16 +70,20 @@ function getOrCreateUser(user) {
 
     const newUser = new User({
       name: user.name,
-      id: user.sub,
-      email: user.email
+      id: user.id,
+      email: user.email,
+      gardenIds: [],
+      friends:[],
+      currency: 0,
+      inventory: []
     });
 
     return newUser.save();
   });
 }
 
-
-function verify (req, res){
+// checks whether the email has been verified
+async function verify (req, res){
   const email = req.body.email;
   const userCode = req.body.code;
 
@@ -80,58 +91,66 @@ function verify (req, res){
   console.log(`Email: ${email}`);
 
   twilioClient.verify
-    .services(process.env.SERVICE_SID)
+    .services(ServiceSid)
     .verificationChecks.create({ to: email, code: userCode })
-    .then(verification_check => {
+    .then(async verification_check => {
       if (verification_check.status === "approved") {
-        Login.verifyUser(email);
-        const info = Login.getInfo(email);
+        await Login.verifyUser(email);
+        const info = await Login.getEmail(email);
         // adds user to big db
         const newUser = getOrCreateUser({
-          name: info.user,
-          sub: info.id,
-          email: email
+          name: info.name,
+          id: info.emailToken,
+          email: email,
         });
           // persist user in the session
           req.session.user = newUser;
           res.send(newUser);
       } else {
-        res.render("verify", {
-          email: email,
-          message: "Verification Failed. Please enter the code from your email"
-        });
+        // res.render("verify", {
+        //   email: email,
+        //   message: "Verification Failed. Please enter the code from your email"
+        // });
+        res.send({err : "Verification Failed -- wrong code."});
       }
     })
     .catch(error => {
       console.log(error);
-      res.render("verify", {
-        email: email,
-        message: "Verification Failed. Please enter the code from your email"
-      });
+      res.send({err : "Verification Failed -- system error."});
+      // next(error)
+      // res.render("verify", {
+      //   email: email,
+      //   message: "Verification Failed. Please enter the code from your email"
+      // });
     });
     };
 
-
+  // login via Greenhouse's DB
   async function loginNormal (req, res) {
-    const user = req.body.username;
-    const userObj = await Login.getUser(user);
+    const user = req.body;
+    const userObj = await Login.getUser(user.username);
     if (!userObj){
       (res.status(401).send({err: "User not found"}))
-    }
-    if (userObj && !Login.verifyStatus(user.name)){
-      sendVerifyCode(userObj.email)
-    }
-    
-  const passwordEntry = await argon2.hash(user.password);
-  if (passwordEntry === userObj.password) {
-      try {
-        req.session.user = user;
-        res.send(user);
-      } catch (err) {
-        console.log(err);
+    } else if (!userObj.isVerified) {
+      console.log('here');
+      sendVerifyCode(userObj.email);
+      res.redirect(`/verify?email=${email}`);
+    } else {   
+        if (await argon2.verify(userObj.password, user.password)) {
+            try {
+              req.session.user = userObj;
+              res.send(userObj);
+            } catch (err) {
+              console.log(err);
+              res.send({err});
+            }
+        } else {
+          res.send({err: 'Wrong Password'})
+        }
+        
+        }
       }
-    }
-  }
+    
 
 /*
 
@@ -187,8 +206,12 @@ function ensureLoggedIn(req, res, next) {
 }
 
 module.exports = {
-  login,
+  googleLogin,
   logout,
+  sendVerifyCode,
+  loginNormal,
+  verify,
+  register,
   populateCurrentUser,
   ensureLoggedIn,
 };
