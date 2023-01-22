@@ -21,8 +21,10 @@ const router = express.Router();
 //initialize socket
 const socketManager = require("./server-socket");
 
-router.post("/login", auth.login);
+router.post("/google-login", auth.googleLogin);
+router.post("register", auth.register);
 router.post("/logout", auth.logout);
+router.post("/verify", auth.verifyNormal);
 router.get("/whoami", (req, res) => {
   if (!req.user) {
     // not logged in
