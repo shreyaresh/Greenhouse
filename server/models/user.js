@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const NotificationSchema = new mongoose.Schema({
-  notificationId: String,
+  type: String,
+  type_id: String,
   content: Mixed
 }
 )
-
 
 const UserSchema = new mongoose.Schema({
   name: String,
@@ -18,6 +18,16 @@ const UserSchema = new mongoose.Schema({
   friends: [String],
   notifications: [Notification]
 });
+
+
+UserSchema.statics.getUser = async function getUser (id) {
+  try {
+      return await this.findOne({ id: id});
+  } catch (err) {
+      console.log(err);
+  }
+}
+
 
 // compile model from schema
 let User = mongoose.model("user", UserSchema);

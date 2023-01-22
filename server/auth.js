@@ -3,7 +3,6 @@ const { OAuth2Client } = require("google-auth-library");
 const User = require("./models/user");
 const Login = require("./models/login");
 const socketManager = require("./server-socket");
-const user = require("./models/user");
 
 require('dotenv').config()
 
@@ -62,7 +61,7 @@ async function sendVerifyCode (email) {
   .verifications.create({to: email, channel: "email"})
   .then(verification => {
     console.log("Verification email sent");
-    return true;
+    return;
   })
   .catch(error => {
     console.log(error);
