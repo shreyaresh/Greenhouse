@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
-const Numbers = require("twilio/lib/rest/Numbers");
+
+const NotificationSchema = new mongoose.Schema({
+  notificationId: String,
+  content: Mixed
+}
+)
+
 
 const UserSchema = new mongoose.Schema({
   name: String,
@@ -8,7 +14,9 @@ const UserSchema = new mongoose.Schema({
   gardenIds: [String],
   friends:[String],
   currency: Number,
-  inventory: [String]
+  inventory: [String],
+  friends: [String],
+  notifications: [Notification]
 });
 
 // compile model from schema

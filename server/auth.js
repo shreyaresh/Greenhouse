@@ -11,7 +11,7 @@ require('dotenv').config()
 const sgMail = require('@sendgrid/mail');
 const twilio = require('twilio');
 const argon2 = require('argon2');
-const crypto = require('crypto')
+const crypto = require('crypto');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -82,7 +82,9 @@ function getOrCreateUser(user) {
       gardenIds: [],
       friends:[],
       currency: 0,
-      inventory: []
+      inventory: [],
+      friends: [],
+      notifications: []
     });
 
     return newUser.save();
