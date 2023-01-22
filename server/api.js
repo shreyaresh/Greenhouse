@@ -29,14 +29,16 @@ router.post("/login", auth.loginNormal);
 router.post("/logout", auth.logout);
 router.post("/verify", auth.verify);
 router.get('/get-verify-code', async (req, res) => {
-    console.log(`Request body for getting a new verify code: ${JSON.stringify(req.body)}`);
     if (await Login.getEmail(req.body.email)) {
       return res.send(auth.sendVerifyCode(req.body.email));
-    } else {
-    res.send({err: "Email is not registered yet."});
     }
-  }
+     return res.send({err: "Email is not registered yet."});
+    }
 );
+router.get("/is-verified", async (req, res) => {
+  const doc = await Login.getEmail(req.body.email);
+  return res.send({verified: doc.isVerified});
+});
 
 router.get("/whoami", (req, res) => {
   if (!req.user) {

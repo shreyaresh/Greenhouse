@@ -21,10 +21,12 @@ const twilioClient = twilio(accountSid, authToken);
 
 
 async function createlocalUser (user) {
-  console.log(`Request body for user function: ${user}`);
+  console.log(`Request body for user function: ${JSON.stringify(user)}`);
   if (await Login.getUser(user.username)){
+    console.log(await Login.getUser(user.username));
     return false;
   } else if (await Login.getEmail(user.email)){ 
+    console.log(await Login.getEmail(user.username));
     return false;
   } else {  
     const newUser = Login({
@@ -50,7 +52,11 @@ async function register(req, res) {
 }
 
 // sends the code to the email
-function sendVerifyCode (email) {
+async function sendVerifyCode (email) {
+  if (await Login.getEmail(email).then((res) => res.isVerified)) {
+    console.log('User already verified.')
+    return;
+  }
   twilioClient.verify.services(ServiceSid)
   .verifications.create({to: email, channel: "email"})
   .then(verification => {
