@@ -118,16 +118,19 @@ async function gardensWith (req, res) {
     let gardensWithFriend = [];
     const friend = req.body.id;
     if (req.user) {
-      let gardenObj;
-      for (let gardenId of req.user.gardenIds) {
-        let gardenObj = await Garden.findOne({_id: gardenId});
-        if (gardenObj.userOneId === friend || gardenObj.userTwoId === friend) {
-          gardensWithFriend.push([gardenObj.name, gardenObj.dateCreated, gardenObj.lastVisited]);
+        let gardenObj;
+        if (req.user.gardenIds.length){
+            for (let gardenId of req.user.gardenIds) {
+                let gardenObj = await Garden.findOne({_id: gardenId});
+                if (gardenObj.userOneId === friend || gardenObj.userTwoId === friend) {
+                  gardensWithFriend.push([gardenObj.name, gardenObj.dateCreated, gardenObj.lastVisited]);
+                }
+            }
         }
     return res.status(200).send(gardensWithFriend);
       }
-    }
-  }
+    return res.status(400).send({ err: "Not logged in."});
+  };
 
 module.exports = {
     makeFriendRequest,
