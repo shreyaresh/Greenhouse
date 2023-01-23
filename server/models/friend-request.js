@@ -4,8 +4,10 @@ const FriendRequestSchema = new mongoose.Schema({
     friendReqId: String,
     Date: Date,
     userIdFrom: String,
+    usernameFrom: String,
     userIdTo: String,
-    status: Number
+    usernameTo: String,
+    status: String
 });
 
 FriendRequest.statics.alreadyExists = async function (userFrom, userTo) {

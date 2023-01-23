@@ -16,6 +16,7 @@ const Garden = require("./models/garden");
 
 // import authentication library
 const auth = require("./auth");
+const friends = require('./friends');
 
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
@@ -56,9 +57,34 @@ router.post("/initsocket", (req, res) => {
   res.send({});
 });
 
-// |------------------------------|
-// | write your API methods below!|
-// |------------------------------|
+
+router.post("/handle-friend-request", friends.handleFriendRequest);
+router.post("/add-friend", friends.makeFriendRequest);
+router.post("/delete-friend", friends.deleteFriend);
+router.get("/friends", (req, res) => {if (req.user) {res.send(req.user.friends);}});
+router.get("/gardens-with", friends.gardensWith);
+
+
+router.get("/all-gardens", async (req, res) => {
+  if (req.user) {
+    let gardenObj;
+    let gardenProps = [];
+    for (let gardenId of req.user.gardenIds) {
+      let gardenObj = await Garden.findOne({_id: gardenId});
+      let user1 = await User.findOne({_id: gardenObj.userOneId});
+      let user2 = await User.findOne({_id: gardenObj.userTwoId})
+      // add garden id and friend name
+      gardenProps.push([gardenId, (user2.name ? (user1 === req.user) : user1.name)]);
+      }
+    return res.status(200).send(gardenProps);
+    }
+  });
+
+router.get("/garden", async (req, res) => {
+    return res.status(200).send(await Garden.find({_id: req.body.gardenId}));
+});
+
+
 
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {

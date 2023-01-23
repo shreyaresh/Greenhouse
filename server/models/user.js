@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const NotificationSchema = new mongoose.Schema({
   type: String,
   type_id: String,
+  date: Date,
   content: Mixed
 }
 )
@@ -27,7 +28,6 @@ UserSchema.statics.getUser = async function getUser (id) {
       console.log(err);
   }
 }
-
 
 // compile model from schema
 let User = mongoose.model("user", UserSchema);

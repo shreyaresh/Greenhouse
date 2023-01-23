@@ -8,7 +8,7 @@ const Position = new mongoose.Schema({
 })
 
 const GardenSchema = new mongoose.Schema({
-    gardenId: String,
+    name: String,
     userOneId: String,
     userTwoId: String,
     dateCreated: Date,
