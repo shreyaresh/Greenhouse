@@ -72,13 +72,15 @@ router.get("/all-gardens", async (req, res) => {
   if (req.user) {
     let gardenObj;
     let gardenProps = [];
-    for (let gardenId of req.user.gardenIds) {
-      let gardenObj = await Garden.findOne({_id: gardenId});
-      let user1 = await User.findOne({_id: gardenObj.userOneId});
-      let user2 = await User.findOne({_id: gardenObj.userTwoId})
-      // add garden id and friend name
-      gardenProps.push([gardenObj.name, gardenId, (user2.name ? (user1 === req.user) : user1.name)]);
-      }
+    if (req.user.gardenIds.length) {
+      for (let gardenId of req.user.gardenIds) {
+        let gardenObj = await Garden.findOne({_id: gardenId});
+        let user1 = await User.findOne({_id: gardenObj.userOneId});
+        let user2 = await User.findOne({_id: gardenObj.userTwoId})
+        // add garden id and friend name
+        gardenProps.push([gardenObj.name, gardenId, (user2.name ? (user1 === req.user) : user1.name)]);
+        }
+    }    
     return res.status(200).send(gardenProps);
     }
   });
