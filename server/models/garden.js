@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 
+// be able to change coords, but not remove unless you are the user who planted it
 const Position = new mongoose.Schema({
+        userId: String,
         position_x: Number,
         position_y: Number,
         item_id: String,
@@ -9,9 +11,10 @@ const Position = new mongoose.Schema({
 
 const GardenSchema = new mongoose.Schema({
     name: String,
-    userOneId: String,
-    userTwoId: String,
+    userIds: [String],
     dateCreated: Date,
+    isVerified: Boolean,
+
     lastVisited: Date,
     coordinates :[Position]
 })

@@ -15,8 +15,6 @@
 
 // validator runs some basic checks to make sure you've set everything up correctly
 // this is a tool provided by staff, so you don't need to worry about it
-require('dotenv').config()
-
 const validator = require("./validator");
 validator.checkSetup();
 
@@ -38,6 +36,7 @@ require('dotenv').config()
 const mongoConnectionURL = process.env.MONGO_SRV;
 // TODO change database name to the name you chose
 const databaseName = "Greenhouse";
+
 
 // connect to mongodb
 mongoose
