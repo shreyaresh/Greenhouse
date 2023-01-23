@@ -65,6 +65,7 @@ router.post("/handle-friend-request", friends.handleFriendRequest);
 router.post("/add-friend", friends.makeFriendRequest);
 router.post("/delete-friend", friends.deleteFriend);
 router.get("/friends", (req, res) => {if (req.user) {res.send(req.user.friends);}});
+router.get("/friend-requests", async (req, res) => {return res.status(200).send(FriendRequest.find({userIdTo : req.user._id}))});
 router.get("/gardens-with", friends.gardensWith);
 
 
@@ -86,7 +87,7 @@ router.get("/all-gardens", async (req, res) => {
   });
 
 router.get("/garden", async (req, res) => {
-    return res.status(200).send(await Garden.find({_id: req.body.gardenId}));
+    return res.status(200).send(await Garden.findById(req.body.gardenId));
 });
 
 // anything else falls to this "not found" case
