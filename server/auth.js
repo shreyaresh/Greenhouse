@@ -77,12 +77,13 @@ async function newVerifyCode (req, res) {
 }
 
 // gets user from DB, or makes a new account if it doesn't exist yet
-function getOrCreateUser(user) {
+async function getOrCreateUser (user) {
   // the "sub" field means "subject", which is a unique identifier for each user
-  return User.findOne({ id: user.sub }).then((existingUser) => {
+
+  return User.findOne({ email: user.email }).then((existingUser) => {
     if (existingUser) return existingUser;
     const newUser = new User({
-      name: user.name,
+      name: ((user.sub) ? user.email.split('@')[0] : user.name),
       id: (user.id? user.id: user.sub),
       email: user.email,
       gardenIds: [],
