@@ -12,6 +12,7 @@ const GardenSchema = new mongoose.Schema({
     userOneId: String,
     userTwoId: String,
     dateCreated: Date,
+    lastVisited: Gate,
     lastActive: Date,
     coordinates :[Position]
 })

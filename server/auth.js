@@ -51,6 +51,7 @@ async function register(req, res) {
   }
 }
 
+
 // sends the code to the email
 async function sendVerifyCode (email) {
   if (await Login.getEmail(email).then((res) => res.isVerified)) {
@@ -66,6 +67,13 @@ async function sendVerifyCode (email) {
   .catch(error => {
     console.log(error);
   });
+}
+
+async function newVerifyCode (req, res) {
+  if (await Login.getEmail(req.body.email)) {
+    return res.send(auth.sendVerifyCode(req.body.email));
+  }
+   return res.send({err: "Email is not registered yet."});
 }
 
 // gets user from DB, or makes a new account if it doesn't exist yet
@@ -216,6 +224,7 @@ module.exports = {
   googleLogin,
   logout,
   sendVerifyCode,
+  newVerifyCode,
   loginNormal,
   verify,
   register,

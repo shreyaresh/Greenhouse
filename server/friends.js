@@ -83,7 +83,7 @@ async function handleFriendRequest (req, res) {
     return res.status(500).send({err: "Internal Server Error."});
 }
 
-// body: id, username
+// body: friend id, username
 async function deleteFriend (req, res) {
     try {
         const toDelete = req.body.id;
@@ -101,15 +101,16 @@ async function deleteFriend (req, res) {
     }
 }
 
-// returns array of garden names shared with a friend id
+// returns array of the garden names, date created, and last visited shared with a friend id
 async function gardensWith (req, res) {
     let gardensWithFriend = [];
+    const friend = req.body.id;
     if (req.user) {
       let gardenObj;
       for (let gardenId of req.user.gardenIds) {
         let gardenObj = await Garden.findOne({_id: gardenId});
-        if (gardenObj.userOneId === req.body.id || gardenObj.userTwoId === req.body.id) {
-          gardensWithFriend.push(gardenObj.name);
+        if (gardenObj.userOneId === friend || gardenObj.userTwoId === friend) {
+          gardensWithFriend.push([gardenObj.name, gardenObj.dateCreated, gardenObj.lastVisited]);
         }
     return res.status(200).send(gardensWithFriend);
       }
