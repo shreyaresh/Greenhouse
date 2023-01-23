@@ -54,6 +54,13 @@ router.get("/is-verified", async (req, res) => {
   return res.send({verified: doc.isVerified});
 });
 
+router.post("/clear-notifs", async (req, res) => {
+  if (req.user){
+    await User.findByIdAndUpdate(req.user._id, {$set: {notifications: []}});
+    res.send({});
+  }
+})
+
 router.post("/handle-friend-request", friends.handleFriendRequest);
 router.post("/add-friend", friends.makeFriendRequest);
 router.post("/delete-friend", friends.deleteFriend);

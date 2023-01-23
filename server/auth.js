@@ -29,7 +29,7 @@ async function createlocalUser (user) {
     console.log(await Login.getEmail(user.username));
     return false;
   } else {  
-    const newUser = Login({
+    const newUser = new Login({
       name: user.username,
       email: user.email,
       emailToken: crypto.randomBytes(64).toString('hex'),
@@ -142,6 +142,9 @@ async function verify (req, res){
 
   // login via Greenhouse's DB
   async function loginNormal (req, res) {
+    if (req.user){
+      return res.status(400).send({ err: 'Already logged in!'})
+    }
     const user = req.body;
     const userObj = await Login.getUser(user.username);
     if (!userObj){
@@ -153,8 +156,9 @@ async function verify (req, res){
     } else {   
         if (await argon2.verify(userObj.password, user.password)) {
             try {
-              req.session.user = userObj;
-              res.send(userObj);
+              const sessionUser = await User.findOne({ name: userObj.name });
+              req.session.user = sessionUser;
+              res.send(sessionUser);
             } catch (err) {
               console.log(err);
               res.send({err});

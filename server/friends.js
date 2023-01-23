@@ -1,7 +1,7 @@
 const User = require("./models/user");
 const FriendRequest = require('./models/friend-request');
 const Garden = require('./models/garden');
-const uuidv4 = require("uuid/v4");
+const uuid = require("uuid");
 
 async function sendNotification (id, type, type_id, content) {
     // const recipient = await User.getUser(id);
@@ -29,25 +29,42 @@ async function sendNotification (id, type, type_id, content) {
 
 // sends a friend request: to (other person's username)
 async function makeFriendRequest (req, res) {
-    const from_id = req.session.user._id;
-    const recipient = await User.getUser(req.body.to)
-    if (recipient.friends.includes(from_id)) {
-        return res.status(400).send({err: 'Already friends with this user.'})
+    if (!req.user) {
+        return res.status(400).send({msg: "Must be logged in."})
     }
+    // don't add yourself
+    if (req.user.name === req.body.to) {
+        return res.status(400).send({msg: "You cannot add yourself!"})
+    };
+
+    const from_id = req.user._id;
+    const to_name = req.body.to;
+    const recipient = await User.findOne({name : to_name});
+
     if (recipient) {
+
+        if (await FriendRequest.findOne({userIdFrom: from_id, userIdTo: recipient._id})){
+            return res.status(400).send({ err: `Already sent friend request! ${existing}`})
+        }
+
+        if (await User.findOne({_id : from_id, "friends.username": req.body.to})) {
+            return res.status(400).send({ err: 'Already friends with this user.' })
+        }
+    
         const newFriendRequest = new FriendRequest({
-            friendReqId: uuidv4(),
+            friendReqId: uuid.v4(),
             userIdFrom: from_id,
             usernameFrom: req.session.user.name,
             userIdTo: recipient._id,
             usernameTo: recipient.name,
             status: '1'
         })     
+
         newFriendRequest.save();
 
         const notifContent = `${req.session.user.name} has sent you a friend request!`
         await sendNotification(recipient._id, 'friend-request', newFriendRequest.friendReqId, notifContent);
-
+        console.log(recipient);
         return res.status(200).send({msg: 'Request successfully sent!'});
     }
 
@@ -57,42 +74,37 @@ async function makeFriendRequest (req, res) {
 // call when deciding a friend request: status, Notification type_id
 async function handleFriendRequest (req, res) {
     const status = req.body.status;
-    const friendRequestId = req.body.type_id;
-    const request = await FriendRequest.getRequest(friendRequestId);
+    try {
+        const friendRequestId = req.body.type_id;
+        const request = await FriendRequest.getRequest(friendRequestId);
+        const userFrom = await User.getUser(request.userIdFrom);
+        const userTo = await User.getUser(request.userIdTo);
 
     if (status === '2') {
-        await User.updateOne(
-                { _id: request.userIdFrom }, 
-                { $addToSet: { friends: request.userIdTo } }
-              );
-        await User.updateOne(
-                { _id: request.userIdTo }, 
-                { $addToSet: { friends: request.userIdFrom } }
-              );
-        FriendRequest.remove(request);
-        FriendRequest.remove(await FriendRequest.alreadyExists(request.userIdFrom, request.userIdTo));
+        await User.findByIdAndUpdate(request.userIdFrom, { $addToSet: { friends: {username: userTo.name, id: request.userIdTo}}});
+        await User.findByIdAndUpdate(request.userIdTo, { $addToSet: { friends: {username: userFrom.name, id: request.userIdFrom}}});
+        await FriendRequest.deleteOne({friendReqId: friendRequestId});
+        await FriendRequest.deleteOne({ userIdTo: userFrom, userIdFrom: userTo });
         await sendNotification(request.userIdFrom, 'message', 'NaN', `${req.session.user.name} accepted your friend request!`);
         return res.status(200).send({msg: `Added friend request from ${request.usernameFrom}!`});
         };
 
     if (status === '3') {
-        FriendRequest.remove(request);
+        FriendRequest.deleteOne({friendReqId: friendRequestId});
         return res.status(200).send({msg: `Removed friend request.`})
-    } 
+    }
 
-    return res.status(500).send({err: "Internal Server Error."});
+    } catch (err) {
+        return res.status(500).send(err);
+    }
 }
 
 // body: friend id, username
 async function deleteFriend (req, res) {
     try {
-        const toDelete = req.body.id;
-        await User.updateOne(
-            {_id: req.session.user._id}, 
-            {$pull: { friends: toDelete}});
-        await User.updateOne(
-            {id: toDelete}, 
-            {$pull: { friends: req.session.user._id}});
+        const toDelete = req.body.username;
+        await User.findByIdAndUpdate(req.session.user._id, {$pull: { friends: {username: toDelete}}});
+        await User.findByIdAndUpdate(req.body.id, {$pull: { friends: {username: req.session.user.name}}});
         res.status(200).send({msg: `Friend ${req.body.username} deleted!`})
           
     } catch(err) {

@@ -10,11 +10,12 @@ const FriendRequestSchema = new mongoose.Schema({
     status: String
 });
 
-FriendRequest.statics.alreadyExists = async function (userFrom, userTo) {
-    return await FriendRequest.findOne({ userIdTo: userFrom, userIdFrom: userTo });
+
+FriendRequestSchema.statics.alreadyExists = async function (userFrom, userTo) {
+    return await this.findOne({ userIdTo: userFrom, userIdFrom: userTo });
 }
 
-FriendRequest.statics.getRequest = async function(id) {return await FriendRequest.findOne({friendReqId : id});}
+FriendRequestSchema.statics.getRequest = async function(id) {try{return await this.findOne({friendReqId : id});} catch(err){console.log(err);}}
 
-let FriendRequest = mongoose.model("friendRequest", UserSchema);
+let FriendRequest = mongoose.model("friendRequest", FriendRequestSchema);
 module.exports = FriendRequest;
