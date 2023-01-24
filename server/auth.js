@@ -46,7 +46,9 @@ async function register(req, res) {
     res.status(400).send({ err: "User already exists in system." })
   } else {;
   console.log("User created successfully.")
-  if (sendVerifyCode(user.email)){res.redirect(`/verify?email=${user.email}`);}
+  if (sendVerifyCode(user.email)){
+      res.status(200).send({success: true})
+    }
   }
 }
 
@@ -120,16 +122,11 @@ async function verify (req, res){
         });
           // persist user in the session
           req.session.user = newUser;
-          return res.send(newUser);
       } else {
-        res.send({err : "Verification Failed -- wrong code."});
+        res.status(400).send({err : "Verification Failed -- wrong code."});
       }
-    })
-    .catch(error => {
-      console.log(error);
-      res.send({err : "Verification Failed -- system error."});
     });
-    };
+}
 
   // login via Greenhouse's DB
   async function loginNormal (req, res) {
@@ -140,26 +137,26 @@ async function verify (req, res){
     const userObj = await Login.getUser(user.username);
     if (!userObj){
       (res.status(401).send({err: "User not found"}))
-    } else if (!userObj.isVerified) {
-      console.log('here');
-      sendVerifyCode(userObj.email);
-      res.redirect(`/verify?email=${email}`);
     } else {   
         if (await argon2.verify(userObj.password, user.password)) {
+            if (!userObj.isVerified) {
+                console.log('here');
+                sendVerifyCode(userObj.email);
+            } 
             try {
               const sessionUser = await User.findOne({ name: userObj.name });
               req.session.user = sessionUser;
               res.send(sessionUser);
             } catch (err) {
               console.log(err);
-              res.send({err});
+              res.send({err: err});
             }
         } else {
           res.send({err: 'Wrong Password'})
         }
         
         }
-      }
+}
     
 
 /*
