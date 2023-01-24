@@ -30,7 +30,7 @@ router.get("/whoami", (req, res) => {
     // not logged in
     return res.send({});
   }
-  res.send(req.session.user);
+  res.send(User.findById(req.session.user._id));
 });
 
 
