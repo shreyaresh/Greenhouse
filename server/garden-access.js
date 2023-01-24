@@ -69,5 +69,9 @@ async function gardenAccess (req, res) {
 }
 
 
+module.exports = {
+    createGarden,
+    gardenAccess
+};
 // sockets for in-game play
 // TO DO: add socket for adding and removing items
