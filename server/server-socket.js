@@ -132,19 +132,43 @@ async function gardenItemAdd(payload, callback) {
     });
   }
 
+  try {
+    const doNotOwn  = await User.findOne({_id : payload.userId, items: {$elemMatch: {
+      item_id: payload.item_id,
+      growthTime: payload.growthTime,
+      growthStage: payload.growthStage,
+      quantity: {$lt: 1}
+    }}});
+    } catch {
+      return callback({
+        error: "Unable to query for item.",
+      });
+    }
+    if (doNotOwn) {
+      return callback({
+        error: "You do not own this item.",
+        errorDetails: error.details,
+      });
+    }
+
   // to consider: user can take an item out and essentially reset growth time periodically
   try {
-  const updatedGarden = await Garden.findByIdAndUpdate(payload.gardenId,
-    { $addToSet : {items : {
-      userId: userId,
-      growthTime: growthTime,
-      position_x: position_x,
-      position_y: position_y,
-      item_id: item_id,
-      growthStage: growthStage
-    }}},
-    {new:true}); 
-    this.to(payload.gardenId).emit('garden:add', updatedGarden);
+    await User.findByIdAndUpdate(payload.userId, {$inc: {"inventory.$[item].quantity" : -1}}, {arrayFilters: [{
+      "item.item_id": item_id,
+      "item.growthStage": payload.growthStage,
+      "item.growthStage": payload.growthTime
+    }]})
+    const updatedGarden = await Garden.findByIdAndUpdate(payload.gardenId,
+      { $addToSet : {items : {
+        userId: userId,
+        growthTime: growthTime,
+        position_x: position_x,
+        position_y: position_y,
+        item_id: item_id,
+        growthStage: growthStage
+      }}},
+      {new:true}); 
+      this.to(payload.gardenId).emit('garden:add', updatedGarden);
   } catch {
     return callback({
       error: "Unable to query and update for new item.",
@@ -184,11 +208,13 @@ async function gardenItemDelete (payload, callback) {
   };
 
   try{
-   const updatedDoc = await User.findByIdAndUpdate(payload.userId, {$push : {inventory : {
-    growthTime: payload.growthTime,
-    item_id: payload.item_id,
-    growthStage: payload.growthStage
-  }}}, {new: true});
+   const updatedDoc = await User.findByIdAndUpdate(payload.userId, {$inc: {"inventory.$[item].quantity" : 1}}, {arrayFilters: [{
+    "item.item_id": item_id,
+    "item.growthStage": payload.growthStage,
+    "item.growthStage": payload.growthTime
+  }]}, 
+    {new: true});
+    this.emit("updated", {userId: payload.userId});
     this.to(payload.gardenId).emit('garden:delete', updatedDoc);
   } catch {
     return callback({

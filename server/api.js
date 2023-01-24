@@ -56,8 +56,8 @@ router.get("/is-verified", async (req, res) => {
 
 router.post("/clear-notifs", async (req, res) => {
   if (req.user){
-    await User.findByIdAndUpdate(req.user._id, {$set: {notifications: []}});
-    res.send(req.user);
+    const user = await User.findByIdAndUpdate(req.user._id, {$set: {notifications: []}}, {new:true});
+    res.send(user);
   }
 })
 

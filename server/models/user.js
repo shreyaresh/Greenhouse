@@ -8,7 +8,8 @@ const Friend = new mongoose.Schema({
 const Item = new mongoose.Schema({
   growthTime: Number,
   item_id: String,
-  growthStage: Number
+  growthStage: Number,
+  quantity: Number
 })
 const Notification = new mongoose.Schema({
   type: String,
