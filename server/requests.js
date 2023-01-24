@@ -94,7 +94,7 @@ async function handleRequest (req, res) {
                 dateCreated: new Date(),
                 isVerified: false,
                 lastVisited: null,
-                coordinates: []
+                items: []
             });
             newGarden.save();
             await User.findByIdAndUpdate(userFrom._id, { $addToSet: { [addToField]: newGarden._id}});
@@ -144,7 +144,7 @@ async function deleteGarden (req, res) {
 }
 
 
-// returns array of the garden names, date created, and last visited shared with a friend id
+// returns array of the garden names, date created, verification status, and last visited shared with a friend id
 async function gardensWith (req, res) {
     let gardensWithFriend = [];
     const friend = req.body.id;
@@ -154,7 +154,7 @@ async function gardensWith (req, res) {
                 const gardenObj = await Garden.findById(gardenId);
                 const friend_id  = gardenObj.userIds.filter(function (el) {return el !== String(req.user._id);})
                 if (friend_id === friend) {
-                  gardensWithFriend.push([gardenObj.name, gardenObj.dateCreated, gardenObj.lastVisited]);
+                  gardensWithFriend.push([gardenObj.name, gardenObj.dateCreated, gardenObj.isVerified, gardenObj.lastVisited]);
                 }
             }
         }
