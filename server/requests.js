@@ -2,7 +2,6 @@ const User = require("./models/user");
 const { GardenRequest, FriendRequest } = require('./models/request');
 const Garden = require('./models/garden');
 const uuid = require("uuid");
-import { getSocketFromUserID } from "./server-socket";
 
 
 async function sendNotification (id, type, type_id, content) {
@@ -17,7 +16,6 @@ async function sendNotification (id, type, type_id, content) {
             } 
         }
       );
-    getSocketFromUserID(id).emit("update", {userId: id});
 }
 
 // sends a friend request: to (other person's username)
@@ -110,7 +108,6 @@ async function handleRequest (req, res) {
 
     if (status === '3') {
         FriendRequest.deleteOne({[requestIdField]: requestId});
-        getSocketFromUserID(req.user._id).emit("update", {userId: req.user._id});
         return res.status(200).send({msg: `Removed ${req.body.type.split('-')[0]} request.`})
     }
 
@@ -121,9 +118,7 @@ async function deleteFriend (req, res) {
     try {
         const toDelete = req.body.username;
         await User.findByIdAndUpdate(req.session.user._id, {$pull: { friends: {username: toDelete}}});
-        getSocketFromUserID(req.user._id).emit("update", {userId: req.user._id});
         await User.findByIdAndUpdate(req.body.id, {$pull: { friends: {username: req.session.user.name}}});
-        getSocketFromUserID(req.body.id).emit("update", {userId: req.body.id});
         res.status(200).send({msg: `Friend ${req.body.username} deleted!`})
           
     } catch(err) {
@@ -139,8 +134,6 @@ async function deleteGarden (req, res) {
         const gardenNameStore = garden.name
         for (const user of garden.userIds) {
             User.findByIdAndUpdate(user, {$pull: { gardenIds: toDelete}});
-            getSocketFromUserID(id).emit("update", {userId: id});
-            getSocketFromUserID(id).emit("leaveRoom", {});
         }
         res.status(200).send({msg: `Garden ${gardenNameStore} deleted!`});
           

@@ -1,7 +1,7 @@
 let io;
 const Joi = require("joi");
-const Garden = "./models/garden";
-const User = "./models/user"
+const Garden = require("./models/garden");
+const User = require("./models/user");
 
 const userToSocketMap = {}; // maps user ID to socket object
 const socketToUserMap = {}; // maps socket ID to user object
@@ -258,19 +258,30 @@ async function updated () {
   }
 }
 
-function leaveRoom (payload) {
-  io.socketsLeave(payload.roomId);
-}
 
 module.exports = {
   init: (http) => {
     io = require("socket.io")(http);
-
+    
     io.on("connection", (socket) => {
+
+      User.watch([{ $match: {operationType: {$in: ['insert']}}}]).
+      on('change', data => {
+          console.log('Insert action triggered');
+          console.log(new Date(), data.fullDocument);
+          ((getSocketFromUserID(data.fullDocument._id)) ? getSocketFromUserID(data.fullDocument._id).emit("updated", data.fullDocument) : null);
+        });
+      User.watch([{ $match: {operationType: {$in: ['update']}}}]).
+      on('change', data => {
+        console.log('Update action triggered');
+        console.log(new Date(), data.updateDescription.updatedFields);
+        ((getSocketFromUserID(data.fullDocument._id)) ? getSocketFromUserID(data.fullDocument._id).emit("updated", data.fullDocument) : null);
+      });
+
 
       console.log(`socket has connected ${socket.id}`);
       socket.on("joinRoom", joinRooms);
-      socket.on("leaveRoom", leaveRoom);
+      socket.on("leaveRoom", function (payload) {socket.leave(payload.gardenId)});
       socket.on("update", updated);
       socket.on("garden:update", gardenItemUpdate);
       socket.on("garden:add", gardenItemAdd);
@@ -280,6 +291,8 @@ module.exports = {
         removeUser(user, socket);
       });
     });
+
+    
   },
 
   addUser: addUser,

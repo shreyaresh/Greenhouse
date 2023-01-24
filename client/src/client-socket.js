@@ -10,26 +10,42 @@ socket.on("connect", () => {
 
 // SOCKET FUNCTIONS TO INSERT INTO GARDEN PAGE FILE
 
-this.socket.emit("garden:update", { title, completed: false }, (res) => {
-  if ("error" in res) {
-    // display old garden
-  } else {
-    // display new garden
-  }
-});
+// // call whenever user redirects away from room
+// socket.emit("leaveRoom", {gardenId: gardenId});
 
-this.socket.emit("garden:delete", { title, completed: false }, (res) => {
-  if ("error" in res) {
-    // display old garden
-  } else {
-    // display new garden
-  }
-});
+// // call on garden-create POST request
+// socket.emit('joinRoom', {gardenId: gardenId});
 
-this.socket.emit("garden:add", { title, completed: false }, (res) => {
-  if ("error" in res) {
-    // display old garden
-  } else {
-    // display new garden
-  }
-});
+
+// socket.emit("garden:update", { title, completed: false }, (res) => {
+//   if ("error" in res) {
+//     // display old garden
+//   } else {
+//     // display new garden
+//   }
+// });
+
+// socket.emit("garden:delete", { title, completed: false }, (res) => {
+//   if ("error" in res) {
+//     // display old garden
+//   } else {
+//     // display new garden
+//   }
+// });
+
+// socket.emit("garden:add", { title, completed: false }, (res) => {
+//   if ("error" in res) {
+//     // display old garden
+//   } else {
+//     // display new garden
+//   }
+// });
+
+// // call on all pages for user data
+// socket.emit("updated", { title, completed: false }, (res) => {
+//   if ("error" in res) {
+//     // display old information
+//   } else {
+//     // display new information
+//   }
+// });

@@ -42,10 +42,6 @@ router.post("/initsocket", (req, res) => {
   res.send({});
 });
 
-
-
-
-
 router.post("/google-login", auth.googleLogin);
 router.post("/register", auth.register);
 router.post("/login", auth.loginNormal);
