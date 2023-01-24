@@ -28,7 +28,7 @@ router.post("/register", auth.register);
 router.post("/login", auth.loginNormal);
 router.post("/logout", auth.logout);
 router.post("/verify", auth.verify);
-router.get('/get-verify-code', async (req, res) => {
+router.post('/get-verify-code', async (req, res) => {
     if (await Login.getEmail(req.body.email)) {
       return res.send(auth.sendVerifyCode(req.body.email));
     }
@@ -36,7 +36,7 @@ router.get('/get-verify-code', async (req, res) => {
     }
 );
 router.get("/is-verified", async (req, res) => {
-  const doc = await Login.getEmail(req.body.email);
+  const doc = await Login.getEmail(req.query.email);
   return res.send({verified: doc.isVerified});
 });
 
