@@ -15,8 +15,6 @@
 
 // validator runs some basic checks to make sure you've set everything up correctly
 // this is a tool provided by staff, so you don't need to worry about it
-require('dotenv').config()
-
 const validator = require("./validator");
 validator.checkSetup();
 
@@ -39,15 +37,14 @@ const mongoConnectionURL = process.env.MONGO_SRV;
 // TODO change database name to the name you chose
 const databaseName = "Greenhouse";
 
+
 // connect to mongodb
 mongoose
   .connect(mongoConnectionURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     dbName: databaseName,
-    
   })
-  // .then((conn) => conn.connection.db.dropDatabase()) 
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log(`Error connecting to MongoDB: ${err}`));
 

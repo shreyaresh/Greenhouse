@@ -2,8 +2,6 @@
 const { OAuth2Client } = require("google-auth-library");
 const User = require("./models/user");
 const Login = require("./models/login");
-const socketManager = require("./server-socket");
-const user = require("./models/user");
 
 require('dotenv').config()
 
@@ -11,7 +9,7 @@ require('dotenv').config()
 const sgMail = require('@sendgrid/mail');
 const twilio = require('twilio');
 const argon2 = require('argon2');
-const crypto = require('crypto')
+const crypto = require('crypto');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -30,7 +28,7 @@ async function createlocalUser (user) {
     console.log(await Login.getEmail(user.username));
     return false;
   } else {  
-    const newUser = Login({
+    const newUser = new Login({
       name: user.username,
       email: user.email,
       emailToken: crypto.randomBytes(64).toString('hex'),
@@ -54,6 +52,7 @@ async function register(req, res) {
   }
 }
 
+
 // sends the code to the email
 async function sendVerifyCode (email) {
   if (await Login.getEmail(email).then((res) => res.isVerified)) {
@@ -64,27 +63,36 @@ async function sendVerifyCode (email) {
   .verifications.create({to: email, channel: "email"})
   .then(verification => {
     console.log("Verification email sent");
-    return true;
+    return;
   })
   .catch(error => {
     console.log(error);
   });
 }
 
-// gets user from DB, or makes a new account if it doesn't exist yet
-function getOrCreateUser(user) {
-  // the "sub" field means "subject", which is a unique identifier for each user
-  return User.findOne({ id: user.sub }).then((existingUser) => {
-    if (existingUser) return existingUser;
+async function newVerifyCode (req, res) {
+  if (await Login.getEmail(req.body.email)) {
+    return res.send(auth.sendVerifyCode(req.body.email));
+  }
+   return res.send({err: "Email is not registered yet."});
+}
 
+// gets user from DB, or makes a new account if it doesn't exist yet
+async function getOrCreateUser (user) {
+  // the "sub" field means "subject", which is a unique identifier for each user
+
+  return User.findOne({ email: user.email }).then((existingUser) => {
+    if (existingUser) return existingUser;
     const newUser = new User({
-      name: user.name,
-      id: user.id,
+      name: ((user.sub) ? user.email.split('@')[0] : user.name),
+      id: (user.id? user.id: user.sub),
       email: user.email,
       gardenIds: [],
       friends:[],
       currency: 0,
-      inventory: []
+      inventory: [],
+      friends: [],
+      notifications: []
     });
 
     return newUser.save();
@@ -114,28 +122,17 @@ async function verify (req, res){
         });
           // persist user in the session
           req.session.user = newUser;
-          res.status(200).send(newUser);
       } else {
-        // res.render("verify", {
-        //   email: email,
-        //   message: "Verification Failed. Please enter the code from your email"
-        // });
         res.status(400).send({err : "Verification Failed -- wrong code."});
       }
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(400).send({err : "Verification Failed -- system error."});
-      // next(error)
-      // res.render("verify", {
-      //   email: email,
-      //   message: "Verification Failed. Please enter the code from your email"
-      // });
     });
-    };
+}
 
   // login via Greenhouse's DB
   async function loginNormal (req, res) {
+    if (req.user){
+      return res.status(400).send({ err: 'Already logged in!'})
+    }
     const user = req.body;
     const userObj = await Login.getUser(user.username);
     if (!userObj){
@@ -147,8 +144,9 @@ async function verify (req, res){
                 sendVerifyCode(userObj.email);
             } 
             try {
-              req.session.user = userObj;
-              res.send(userObj);
+              const sessionUser = await User.findOne({ name: userObj.name });
+              req.session.user = sessionUser;
+              res.send(sessionUser);
             } catch (err) {
               console.log(err);
               res.send({err: err});
@@ -158,7 +156,7 @@ async function verify (req, res){
         }
         
         }
-      }
+}
     
 
 /*
@@ -218,6 +216,7 @@ module.exports = {
   googleLogin,
   logout,
   sendVerifyCode,
+  newVerifyCode,
   loginNormal,
   verify,
   register,
