@@ -73,7 +73,7 @@ async function gardenItemUpdate (payload, callback) {
   }
 
   try{
-  return await Garden.findByIdAndUpdate(payload.gardenId,
+  const updatedGarden =  await Garden.findByIdAndUpdate(payload.gardenId,
     { $set : {"items.$[item].position_x": payload.position_x, "items.$[item].position_y": payload.position_y }}, 
     {arrayFilters: [{
       "item.item_id": item_id,
@@ -81,7 +81,9 @@ async function gardenItemUpdate (payload, callback) {
       "item.position_y": payload.old_position_y
     }]},
     {new:true}
-  );;
+  );
+  this.to(payload.gardenId).emit('garden:update', updatedGarden);
+
   } catch {
     return callback({
       error: "Unable to query and update item."
@@ -142,7 +144,7 @@ async function gardenItemAdd(payload, callback) {
       growthStage: growthStage
     }}},
     {new:true}); 
-    return updatedGarden;
+    this.to(payload.gardenId).emit('garden:add', updatedGarden);
   } catch {
     return callback({
       error: "Unable to query and update for new item.",
@@ -182,11 +184,12 @@ async function gardenItemDelete (payload, callback) {
   };
 
   try{
-  return await User.findByIdAndUpdate(payload.userId, {$push : {inventory : {
+   const updatedDoc = await User.findByIdAndUpdate(payload.userId, {$push : {inventory : {
     growthTime: payload.growthTime,
     item_id: payload.item_id,
     growthStage: payload.growthStage
   }}}, {new: true});
+    this.to(payload.gardenId).emit('garden:delete', updatedDoc);
   } catch {
     return callback({
       err: "Unable to query and update item."
@@ -220,18 +223,19 @@ async function joinRooms (payload) {
       errorDetails: error.details,
     });
   }
-  
+
   if (user.gardenIds.length) {
     for (const id of user.gardenIds) {
-          socket.join(roomId);
+      if(socket.rooms.includes(id)) {
+        this.join(id);
+      }
     }
   }
 }
 
-async function leaveRoom (payload, callback) {
+async function updated () {
   const userSchema = Joi.object({
-    userId: Joi.array().items(Joi.string()),
-    gardenId: Joi.string()
+    userId: Joi.string()
   });
   const { error, value } = userSchema.tailor("create").validate(payload, {
     abortEarly: false, // return all errors and not just the first one
@@ -244,13 +248,12 @@ async function leaveRoom (payload, callback) {
       errorDetails: error.details,
     });
   } 
-
   try {
-    const garden = await Garden.findById(payload.gardenId);
+    const user = User.findById(payload.userId);
+    ((getSocketFromUserID(user._id)) ? getSocketFromUserID(user._id).emit(user) : null);
   } catch {
     return callback({
-      error: "Unable to query garden.",
-      errorDetails: error.details,
+      error: "Could not retrieve user.",
     });
   }
 }
@@ -265,13 +268,10 @@ module.exports = {
 
     io.on("connection", (socket) => {
 
-      let roomList = [];
-
-      
-
       console.log(`socket has connected ${socket.id}`);
       socket.on("joinRoom", joinRooms);
       socket.on("leaveRoom", leaveRoom);
+      socket.on("update", updated);
       socket.on("garden:update", gardenItemUpdate);
       socket.on("garden:add", gardenItemAdd);
       socket.on("garden:delete", gardenItemDelete);
@@ -288,5 +288,5 @@ module.exports = {
   getSocketFromUserID: getSocketFromUserID,
   getUserFromSocketID: getUserFromSocketID,
   getSocketFromSocketID: getSocketFromSocketID,
-  getIo: () => io,
+  getIo: () => io
 };

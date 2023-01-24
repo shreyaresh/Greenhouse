@@ -121,7 +121,8 @@ async function verify (req, res){
         });
           // persist user in the session
           req.session.user = newUser;
-          res.send(newUser);
+          socketManager.getSocketFromUserID(req.session.user._id).emit('joinRoom', {});
+          return res.send(newUser);
       } else {
         res.send({err : "Verification Failed -- wrong code."});
       }
@@ -150,6 +151,7 @@ async function verify (req, res){
             try {
               const sessionUser = await User.findOne({ name: userObj.name });
               req.session.user = sessionUser;
+              socketManager.getSocketFromUserID(req.session.user._id).emit('joinRoom', {});
               res.send(sessionUser);
             } catch (err) {
               console.log(err);
@@ -189,6 +191,7 @@ function googleLogin(req, res) {
     .then((user) => {
       // persist user in the session
       req.session.user = user;
+      socketManager.getSocketFromUserID(req.session.user._id).emit('joinRoom', {});
       res.send(user);
     })
     .catch((err) => {
