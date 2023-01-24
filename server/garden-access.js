@@ -1,4 +1,3 @@
-const User = require("./models/user");
 const Garden = require("./models/garden");
 
 // // TO-DO: Write these functions

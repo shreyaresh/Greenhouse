@@ -8,7 +8,6 @@
 */
 
 const express = require("express");
-
 // import models so we can interact with the database
 const User = require("./models/user");
 const Login = require("./models/login");
@@ -18,7 +17,7 @@ const Garden = require("./models/garden");
 // import authentication library
 const auth = require("./auth");
 const requests = require('./requests');
-const gardens = require('./garden-actions')
+const gardens = require('./garden-access')
 
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
@@ -31,16 +30,20 @@ router.get("/whoami", (req, res) => {
     // not logged in
     return res.send({});
   }
-
   res.send(req.session.user);
 });
 
+
+// body: socketid to add a user to 
 router.post("/initsocket", (req, res) => {
   // do nothing if user not logged in
   if (req.user)
     socketManager.addUser(req.user, socketManager.getSocketFromSocketID(req.body.socketid));
   res.send({});
 });
+
+
+
 
 
 router.post("/google-login", auth.googleLogin);
@@ -98,8 +101,7 @@ router.get("/garden", async (req, res) => {
     return res.status(200).send(await Garden.findById(req.body.gardenId));
 });
 
-// TO-DO: Write these functions
-// node: unique names only
+
 router.post("/create-garden", gardens.createGarden);
 // // update last visited, update items' growth stages, and return garden document
 router.post("/garden-access", gardens.gardenAccess);
@@ -108,6 +110,7 @@ router.post("/change-garden-name", async (req, res) => {
   const garden = await Garden.findbyIdAndUpdate(gardenId, {name: req.body.name});
   return res.status(200).send({msg : `Garden name changed to ${garden.name}.`});
 })
+
 
 
 // sockets for in-game play

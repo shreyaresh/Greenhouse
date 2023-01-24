@@ -123,21 +123,12 @@ async function verify (req, res){
           req.session.user = newUser;
           res.send(newUser);
       } else {
-        // res.render("verify", {
-        //   email: email,
-        //   message: "Verification Failed. Please enter the code from your email"
-        // });
         res.send({err : "Verification Failed -- wrong code."});
       }
     })
     .catch(error => {
       console.log(error);
       res.send({err : "Verification Failed -- system error."});
-      // next(error)
-      // res.render("verify", {
-      //   email: email,
-      //   message: "Verification Failed. Please enter the code from your email"
-      // });
     });
     };
 

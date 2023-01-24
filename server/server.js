@@ -26,6 +26,7 @@ const mongoose = require("mongoose"); // library to connect to MongoDB
 const path = require("path"); // provide utilities for working with file and directory paths
 const api = require("./api");
 const auth = require("./auth");
+const MongoStore = require("connect-mongo");
 
 // socket stuff
 const socketManager = require("./server-socket");
@@ -44,7 +45,6 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     dbName: databaseName,
-    
   })
   // .then((conn) => conn.connection.db.dropDatabase()) 
   .then(() => console.log("Connected to MongoDB"))
@@ -66,6 +66,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({mongoUrl: process.env.MONGO_SRV})
   })
 );
 
