@@ -1,4 +1,6 @@
 const Garden = require("./models/garden");
+const socketManager = require("./server-socket");
+
 
 // // TO-DO: Write these functions
 
@@ -59,6 +61,9 @@ async function gardenAccess (req, res) {
 
         garden.lastVisited = rightNow;
         garden.save();
+
+        const socket = socketManager.getSocketFromUserID(req.user._id);
+        socket.on('joinRoom', {gardenId: garden._id});
 
         return res.status(200).send({ msg : "Successfully updated your garden! Redirecting..."});
 

@@ -5,6 +5,11 @@ const Friend = new mongoose.Schema({
   id: String
 });
 
+const Item = new mongoose.Schema({
+  growthTime: Number,
+  item_id: String,
+  growthStage: Number
+})
 const Notification = new mongoose.Schema({
   type: String,
   typeId: String,
@@ -19,7 +24,7 @@ const UserSchema = new mongoose.Schema({
   gardenIds: [String],
   friends:[String],
   currency: Number,
-  inventory: [String],
+  inventory: [Item],
   friends: [Friend],
   notifications: [Notification]
 });
