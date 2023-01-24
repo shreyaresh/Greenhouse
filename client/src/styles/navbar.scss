@@ -1,0 +1,31 @@
+#navbar {
+    position:absolute;
+    top:0;
+    width:calc(100vw - 4rem);
+    background-color:$pastel-green;
+    color:black;
+    padding:1rem 2rem;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size:2rem;
+    .logo-wrap {
+        display:flex;
+        align-items: center;
+        column-gap:1rem;
+    }
+    .logo {
+        width:2em;
+    }
+
+    .links {
+        display:flex;
+        column-gap:2rem;
+    }
+
+    a {
+        // color:$white;
+        color:black;
+        text-decoration: none;
+    }
+}

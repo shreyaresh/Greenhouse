@@ -1,0 +1,13 @@
+@charset "utf-8";
+
+// import base@
+@import "./_fonts.scss";
+@import "./_sizes.scss";
+@import "./_colors.scss";
+
+// import pages
+@import "./global.scss";
+@import "./navbar.scss";
+@import "./landing.scss";
+@import "./dashboard.scss";
+@import "./auth.scss";

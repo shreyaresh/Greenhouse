@@ -1,0 +1,29 @@
+#landing {
+    display:flex;
+    height:100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    row-gap:1em;
+
+    .start-button {
+        background-color:$yellow;
+        border-radius:30px;
+        h1 { line-height:1; }
+        padding:0.1rem 2rem;
+        z-index:99;
+
+        &:hover {
+            background-color:$green;
+            cursor:pointer;
+        }
+    }
+
+    .login-text {
+        font-size:1.2em;
+        border-bottom:1px solid $green;
+        color:$green;
+        z-index:99;
+        cursor:pointer;
+    }
+}
