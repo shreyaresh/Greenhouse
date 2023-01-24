@@ -6,16 +6,23 @@
     align-items: center;
     justify-content: center;
     row-gap:1em;
-    form {
-        display:flex;
-        flex-direction: column;
-        row-gap:1em;
+}
+form {
+    display:flex;
+    flex-direction: column;
+    row-gap:1em;    
+    font-family: "rooney-sans", sans-serif !important;
 
-        input {
-            border:1px solid $yellow;
-            padding:1rem 2rem;
-            border-radius:25px;
-            background:none;
+    input {
+        border:1px solid $yellow;
+        padding:1rem 2rem;
+        border-radius:25px;
+        background:none;
+
+        &[type=submit]{
+            background-color:$yellow;
+            font-weight:600;
+            cursor:pointer;
         }
     }
 }

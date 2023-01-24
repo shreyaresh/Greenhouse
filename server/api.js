@@ -86,7 +86,7 @@ router.post("/delete-garden", requests.deleteGarden);
 router.get("/friends", (req, res) => {if (req.user) {res.send(req.user.friends);}});
 router.get("/gardens-with", requests.gardensWith);
 router.get("/requests", async (req, res) => {
-  const requestType = ((req.body.type === 'friend-request') ? FriendRequest : GardenRequest);
+  const requestType = ((req.query.type === 'friend-request') ? FriendRequest : GardenRequest);
   if (req.user) {
   return res.status(200).send(await requestType.find({userIdTo : req.user._id}));
   }

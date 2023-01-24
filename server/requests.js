@@ -23,11 +23,11 @@ async function makeRequest (req, res) {
     const requestType = ((req.body.type === "friend-request") ? FriendRequest : GardenRequest);
 
     if (!req.user) {
-        return res.status(400).send({msg: "Must be logged in."})
+        return res.status(400).send({err: "Must be logged in."})
     }
     // don't add yourself
     if (req.user.name === req.body.to) {
-        return res.status(400).send({msg: "You cannot add yourself!"})
+        return res.status(400).send({err: "You cannot add yourself!"})
     };
 
     const from_id = req.user._id;
