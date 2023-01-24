@@ -104,7 +104,7 @@ async function handleRequest (req, res) {
         await requestType.deleteOne({ userIdTo: userFrom._id, userIdFrom: userTo._id});
         await sendNotification(request.userIdFrom, 'message', 'NaN', `${req.session.user.name} accepted your ${req.body.type.split('-')[0]} request!`);
         return res.status(200).send({msg: `Accepted ${req.body.type.split('-')[0]} request from ${request.usernameFrom}!`});
-        };
+    };
 
     if (status === '3') {
         FriendRequest.deleteOne({[requestIdField]: requestId});

@@ -41,7 +41,7 @@ export default function Friends() {
     function handleAction(e, status, id){
         e.preventDefault();
         post('/api/handle-request', {status: status, type: 'friend-request', type_id: id}).then(res => {
-            console.log(res.msg)
+            console.log(res)
         }).catch(res => console.log(res));
     }
 
@@ -75,8 +75,8 @@ export default function Friends() {
                                 <div className="request" key={index}>
                                     <div className="requester">{req.usernameFrom}</div>
                                     <div className="actions">
-                                        <button onClick={(e) => handleAction(e, 2, req.friendReqId)}>accept</button>
-                                        <button onClick={(e) => handleAction(e, 3, req.friendReqId)}>reject</button>
+                                        <button onClick={(e) => handleAction(e, '2', req.friendReqId)}>accept</button>
+                                        <button onClick={(e) => handleAction(e, '3', req.friendReqId)}>reject</button>
                                     </div>
                                 </div>
                             )
