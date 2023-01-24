@@ -1,51 +1,68 @@
 import React, { useState, useEffect } from "react";
-import { Router } from "@reach/router";
-import jwt_decode from "jwt-decode";
-
+import { BrowserRouter as Router, Routes as Switch, Route, Outlet, Navigate } from "react-router-dom";
+import { SHA256 } from 'crypto-js';
 import NotFound from "./pages/NotFound.js";
-import Skeleton from "./pages/Skeleton.js";
-
-import "../utilities.css";
-
-import { socket } from "../client-socket.js";
-
+import Landing from "./pages/Landing.js";
+import Dashboard from "./pages/Dashboard.js";
+import Login from "./pages/Login.js";
+import Register from "./pages/Register.js";
 import { get, post } from "../utilities";
+import Verify from "./pages/Verify.js";
+
+const AuthLayout = () => {
+    const isLoggedIn = localStorage.getItem('token') != null;
+    if(isLoggedIn){
+        return <Outlet/>
+    }
+    return <Navigate to="/login" replace/>
+}
+
+const PublicLayout = () => {
+    const isLoggedIn = localStorage.getItem('token') != null;
+    if(!isLoggedIn){
+        return <Outlet/>
+    }
+    return <Navigate to="/dashboard" replace/>
+}
 
 /**
  * Define the "App" component
  */
 const App = () => {
-  const [userId, setUserId] = useState(undefined);
 
   useEffect(() => {
     get("/api/whoami").then((user) => {
       if (user._id) {
         // they are registed in the database, and currently logged in.
-        setUserId(user._id);
+        // setUserId(user._id);
+        let hash= SHA256(user._id + "greenhouse" + new Date().toDateString())
+        localStorage.setItem('token', hash)
+      } else {
+          localStorage.removeItem('token')
       }
     });
   }, []);
 
-  const handleLogin = (credentialResponse) => {
-    const userToken = credentialResponse.credential;
-    const decodedCredential = jwt_decode(userToken);
-    console.log(`Logged in as ${decodedCredential.name}`);
-    post("/api/google-login", { token: userToken }).then((user) => {
-      setUserId(user._id);
-      post("/api/initsocket", { socketid: socket.id });
-    });
-  };
-
-  const handleLogout = () => {
-    setUserId(undefined);
-    post("/api/logout");
-  };
-
   return (
     <>
       <Router>
-        <Skeleton path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
-        <NotFound default />
+          <Switch>
+                <Route exact path="/" element={<Landing/>}/>
+                <Route path="/verify" element={<Verify/>}/>
+                <Route element={<PublicLayout/>}>
+                    <Route path="/login" element={<Login/>}/>
+                    <Route path="/register" element={<Register/>}/>
+                </Route>
+                <Route element={<AuthLayout/>}>
+                    <Route path="/dashboard" element={<Dashboard/>}/>
+                </Route>
+            
+                <Route path="*" element={<NotFound/>}/>
+          </Switch>
+        {/* <Landing path="/" userId={userId} />
+        <Dashboard path="/dashboard" userId={userId} handleLogout={handleLogout} />
+        <Login path="/login" handleLogin={handleLogin} userId={userId} />
+        <Register path="/register" userId={userId} /> */}
       </Router>
     </>
   );
