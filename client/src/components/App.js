@@ -6,6 +6,7 @@ import Landing from "./pages/Landing.js";
 import Dashboard from "./pages/Dashboard.js";
 import Login from "./pages/Login.js";
 import Register from "./pages/Register.js";
+import Friends from "./pages/Friends.js";
 import { get, post } from "../utilities";
 import Verify from "./pages/Verify.js";
 
@@ -55,6 +56,7 @@ const App = () => {
                 </Route>
                 <Route element={<AuthLayout/>}>
                     <Route path="/dashboard" element={<Dashboard/>}/>
+                    <Route path="/friends" element={<Friends/>}/>
                 </Route>
             
                 <Route path="*" element={<NotFound/>}/>

@@ -44,7 +44,7 @@
     "sass-loader": "^13.2.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.1",
-    "twilio": "^3.84.1",
+    "twilio": "^2.5.2",
     "url-loader": "^4.1.1",
     "uuid": "^9.0.0"
   },
