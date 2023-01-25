@@ -2,6 +2,7 @@ let io;
 const Joi = require("joi");
 const Garden = require("./models/garden");
 const User = require("./models/user");
+const { FriendRequest } = require('./models/request');
 
 const userToSocketMap = {}; // maps user ID to socket object
 const socketToUserMap = {}; // maps socket ID to user object
@@ -82,7 +83,7 @@ async function gardenItemUpdate (payload, callback) {
     }]},
     {new:true}
   );
-  this.to(payload.gardenId).emit('garden:update', updatedGarden);
+    socket.to(payload.gardenId).emit('garden:update', updatedGarden);
 
   } catch {
     return callback({
@@ -168,7 +169,7 @@ async function gardenItemAdd(payload, callback) {
         growthStage: growthStage
       }}},
       {new:true}); 
-      this.to(payload.gardenId).emit('garden:add', updatedGarden);
+      socket.to(payload.gardenId).emit('garden:add', updatedGarden);
   } catch {
     return callback({
       error: "Unable to query and update for new item.",
@@ -214,8 +215,8 @@ async function gardenItemDelete (payload, callback) {
     "item.growthStage": payload.growthTime
   }]}, 
     {new: true});
-    this.emit("updated", {userId: payload.userId});
-    this.to(payload.gardenId).emit('garden:delete', updatedDoc);
+    socket.emit("updated", {userId: payload.userId});
+    socket.to(payload.gardenId).emit('garden:delete', updatedDoc);
   } catch {
     return callback({
       err: "Unable to query and update item."
@@ -253,37 +254,11 @@ async function joinRooms (payload) {
   if (user.gardenIds.length) {
     for (const id of user.gardenIds) {
       if(socket.rooms.includes(id)) {
-        this.join(id);
+        socket.join(id);
       }
     }
   }
 }
-
-async function updated () {
-  const userSchema = Joi.object({
-    userId: Joi.string()
-  });
-  const { error, value } = userSchema.tailor("create").validate(payload, {
-    abortEarly: false, // return all errors and not just the first one
-    stripUnknown: true, // remove unknown attributes from the payload
-  });
-
-  if (error) {
-    return callback({
-      error: "Invalid payload.",
-      errorDetails: error.details,
-    });
-  } 
-  try {
-    const user = User.findById(payload.userId);
-    ((getSocketFromUserID(user._id)) ? getSocketFromUserID(user._id).emit(user) : null);
-  } catch {
-    return callback({
-      error: "Could not retrieve user.",
-    });
-  }
-}
-
 
 module.exports = {
   init: (http) => {
@@ -291,24 +266,22 @@ module.exports = {
     
     io.on("connection", (socket) => {
 
-      User.watch([{ $match: {operationType: {$in: ['insert']}}}]).
+      User.watch([{ $match: {operationType: {$in: ['insert']}}}], {fullDocument: 'updateLookup'}).
       on('change', data => {
           console.log('Insert action triggered');
           console.log(new Date(), data.fullDocument);
-          ((getSocketFromUserID(data.fullDocument._id)) ? getSocketFromUserID(data.fullDocument._id).emit("updated", data.fullDocument) : null);
-        });
-      User.watch([{ $match: {operationType: {$in: ['update']}}}]).
+5        });
+      User.watch([{ $match: {operationType: {$in: ['update']}}}], {fullDocument: 'updateLookup'}).
       on('change', data => {
         console.log('Update action triggered');
-        console.log(new Date(), data.updateDescription.updatedFields);
+        console.log(new Date(), data.fullDocument);
+        console.log(`User: ${data}`)
         ((getSocketFromUserID(data.fullDocument._id)) ? getSocketFromUserID(data.fullDocument._id).emit("updated", data.fullDocument) : null);
       });
-
 
       console.log(`socket has connected ${socket.id}`);
       socket.on("joinRoom", joinRooms);
       socket.on("leaveRoom", function (payload) {socket.leave(payload.gardenId)});
-      socket.on("update", updated);
       socket.on("garden:update", gardenItemUpdate);
       socket.on("garden:add", gardenItemAdd);
       socket.on("garden:delete", gardenItemDelete);

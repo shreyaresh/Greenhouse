@@ -22,11 +22,15 @@ async function sendNotification (id, type, type_id, content) {
 async function makeRequest (req, res) {
     const requestType = ((req.body.type === "friend-request") ? FriendRequest : GardenRequest);
 
+    console.log(req.user)
+    
     if (!req.user) {
+        console.log('failed at login')
         return res.status(400).send({err: "Must be logged in."})
     }
     // don't add yourself
     if (req.user.name === req.body.to) {
+        console.log('self add')
         return res.status(400).send({err: "You cannot add yourself!"})
     };
 
@@ -37,13 +41,16 @@ async function makeRequest (req, res) {
     if (recipient) {
 
         if (await requestType.findOne({userIdFrom: from_id, userIdTo: recipient._id})){
+            console.log('req sent')
             return res.status(400).send({ err: `Already sent request!`})
         }
 
         if (req.body.type === "friend-request" &&  await User.findOne({_id : from_id, "friends.username": req.body.to})) {
+            console.log('alr friends')
             return res.status(400).send({ err: 'Already friends with this user.' })
         }
         if (req.body.type === "garden-request" && !(await User.findOne({_id : from_id, "friends.username": req.body.to}))){
+            console.log('not friends')
             return res.status(400).send({err : "Not friends with this user."})
         }
     

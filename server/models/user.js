@@ -23,7 +23,6 @@ const UserSchema = new mongoose.Schema({
   id: String,
   email: String,
   gardenIds: [String],
-  friends:[String],
   currency: Number,
   inventory: [Item],
   friends: [Friend],

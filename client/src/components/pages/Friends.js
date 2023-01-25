@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../Layout';
 import { get, post } from '../../utilities';
+import { socket } from '../../client-socket';
 
 export default function Friends() {
     const [friendName, setFriendName] = useState('');
@@ -13,36 +14,53 @@ export default function Friends() {
         post('/api/make-request', {type: 'friend-request', to: friendName}).then((res) => {
             if(res.status === 200){
                 console.log('hello!')
-                setMessage(res.msg);
+                setMessage(res);
             } else {
-                setMessage(res.err);
+                setMessage(res);
             }
         }).catch(res => {
             if(res.err){
                 setMessage(res.err);
             } else {
-                setMessage(res);
+                setMessage(res.msg);
             }
         });
     }
 
     useEffect(() => {
+        
         get('/api/requests', {type: 'friend-request'}).then(res => {
             console.log(res)
             setRequests(res)
         }).catch(res => console.log(res));
         
         get('/api/friends').then(res => {
-            // console.log(res)
+            console.log(res)
             setFriends(res)
         }).catch(res => console.log(res))
+
+
+        socket.on("updated", (res) => {
+            if (!("error" in res)) {
+                setFriends(res.friends);
+                get('/api/requests', {type: 'friend-request'}).then(res => {
+                    console.log(res)
+                    setRequests(res)
+                }).catch(res => console.log(res));
+        }});
+
+        return () => {
+            socket.removeAllListeners();
+        }
     }, []);
 
     function handleAction(e, status, id){
         e.preventDefault();
         post('/api/handle-request', {status: status, type: 'friend-request', type_id: id}).then(res => {
             console.log(res)
-        }).catch(res => console.log(res));
+        }).get('/api/requests', {type: 'friend-request'})
+        .then(res => setFriends(res))
+        .catch(res => console.log(res));
     }
 
     return(
@@ -60,17 +78,17 @@ export default function Friends() {
                 <div className="columns-wrap">
                     <div className="column friend-list">
                         <h2>Friends</h2>
-                        {friends.map((req, index) => {
+                        { (friends.length) ? friends.map((req, index) => {
                             return(
                                 <div className="request" key={index}>
                                     <div className="requester">{req.username}</div>
                                 </div>
                             )
-                        })}
+                        }) : <></>}
                     </div>
                     <div className="column friend-requests">
                         <h2>Requests</h2>
-                        {requests.map((req, index) => {
+                        {(requests) ? requests.map((req, index) => {
                             return(
                                 <div className="request" key={index}>
                                     <div className="requester">{req.usernameFrom}</div>
@@ -80,7 +98,7 @@ export default function Friends() {
                                     </div>
                                 </div>
                             )
-                        })}
+                        }) : <></>}
                     </div>
                 </div>
             </div>
