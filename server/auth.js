@@ -20,12 +20,9 @@ const twilioClient = twilio(accountSid, authToken);
 
 
 async function createlocalUser (user) {
-  console.log(`Request body for user function: ${JSON.stringify(user)}`);
   if (await Login.getUser(user.username)){
-    console.log(await Login.getUser(user.username));
     return false;
   } else if (await Login.getEmail(user.email)){ 
-    console.log(await Login.getEmail(user.username));
     return false;
   } else {  
     const newUser = new Login({
@@ -140,7 +137,6 @@ async function verify (req, res){
     } else {   
         if (await argon2.verify(userObj.password, user.password)) {
             if (!userObj.isVerified) {
-                console.log('here');
                 sendVerifyCode(userObj.email);
             } 
             try {

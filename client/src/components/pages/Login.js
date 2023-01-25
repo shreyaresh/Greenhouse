@@ -13,7 +13,7 @@ export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [success, setSuccess] = useState(null);
-      const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const handleLogin = (credentialResponse) => {
         const userToken = credentialResponse.credential;
@@ -21,7 +21,7 @@ export default function Login() {
         console.log(`Logged in as ${decodedCredential.name}`);
         post("/api/google-login", { token: userToken }).then((user) => {
         //   setUserId(user._id);
-            setSuccess(true);
+            setSuccess(user);
             post("/api/initsocket", { socketid: socket.id });
         });
     };
@@ -40,6 +40,7 @@ export default function Login() {
         if(success && !success.isVerified){
             navigate(`/verify?email=${success.email}`, {replace: true});
         } else if(success){
+            console.log("Succeeded! Redirecting...")
             let hash= SHA256(username + "greenhouse" + new Date().toDateString())
             localStorage.setItem('token', hash)
             navigate('/dashboard', {replace: true});

@@ -62,8 +62,6 @@ async function gardenAccess (req, res) {
         garden.lastVisited = rightNow;
         garden.save();
 
-        socketManager.getSocketFromUserID(req.user._id).emit('joinRoom', {});
-
         return res.status(200).send({ msg : "Successfully updated your garden! Redirecting..."});
 
     } catch(err){

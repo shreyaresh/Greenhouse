@@ -37,9 +37,11 @@ router.post('/get-verify-code', async (req, res) => {
      return res.send({err: "Email is not registered yet."});
     }
 );
-router.get("/is-verified", async (req, res) => {
-  const doc = await Login.getEmail(req.query.email);
-  return res.send({verified: doc.isVerified});
+router.get("/is-verified", (req, res) => {
+  let truth = User.findOne({ email: req.query.email})
+              .then((res) => truth = ((res) ? true: false))
+  
+  return res.send({verified: truth});
 });
 
 router.get("/whoami", (req, res) => {
