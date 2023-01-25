@@ -58,7 +58,7 @@ module.exports = {
             loader: "url-loader",
           },
         ],
-      },
+      }              
     ],
   },
   resolve: {
