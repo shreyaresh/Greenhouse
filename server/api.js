@@ -83,7 +83,7 @@ router.post("/handle-request", requests.handleRequest);
 router.post("/make-request", requests.makeRequest);
 router.post("/delete-friend", requests.deleteFriend);
 router.post("/delete-garden", requests.deleteGarden);
-router.get("/friends", (req, res) => {if (req.user) {res.send(req.user.friends);}});
+router.get("/friends", (req, res) => {if (req.user) {res.send(User.findById(req.user._id)).then((result) => {return result.friends});}});
 router.get("/gardens-with", requests.gardensWith);
 router.get("/requests", async (req, res) => {
   const requestType = ((req.body.type === 'friend-request') ? FriendRequest : GardenRequest);
