@@ -7,6 +7,10 @@
     justify-content: center;
     row-gap:1em;
 }
+
+.errorText {
+    color: $error
+}
 form {
     display:flex;
     flex-direction: column;

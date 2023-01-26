@@ -12,6 +12,7 @@ const GOOGLE_CLIENT_ID = "239958526497-k9s3q5out7d1vbcp7h8gie4pl58f1m26.apps.goo
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = (credentialResponse) => {
@@ -35,7 +36,7 @@ export default function Login() {
                 localStorage.setItem('token', hash)
             }
             navigate(res.url, {replace: true})
-        }).catch(error => window.alert("incorrect username or password: " + error));    
+        }).catch(setMessage("incorrect username or password!"));    
         e.preventDefault();
     }
     
@@ -44,7 +45,7 @@ export default function Login() {
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <Layout loggedIn={false}>
             <div className="auth">
-
+                <p className = "errorText"> {message} </p>
                 <form onSubmit={handleSubmit} method="POST">
                     <input type="text" 
                         placeholder={"username"}
