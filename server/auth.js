@@ -138,11 +138,12 @@ async function verify (req, res){
         if (await argon2.verify(userObj.password, user.password)) {
             if (!userObj.isVerified) {
                 sendVerifyCode(userObj.email);
+                res.send({url:`/verify?email=${userObj.email}`});
             } 
             try {
               const sessionUser = await User.findOne({ name: userObj.name });
               req.session.user = sessionUser;
-              res.send(sessionUser);
+              res.send({url:'/dashboard'});
             } catch (err) {
               console.log(err);
               res.send({err: err});
@@ -181,7 +182,7 @@ function googleLogin(req, res) {
     .then((user) => {
       // persist user in the session
       req.session.user = user;
-      res.send(user);
+      res.send({url:'/dashboard'});
     })
     .catch((err) => {
       console.log(`Failed to log in: ${err}`);

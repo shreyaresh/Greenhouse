@@ -12,40 +12,32 @@ const GOOGLE_CLIENT_ID = "239958526497-k9s3q5out7d1vbcp7h8gie4pl58f1m26.apps.goo
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [success, setSuccess] = useState(null);
     const navigate = useNavigate();
 
     const handleLogin = (credentialResponse) => {
         const userToken = credentialResponse.credential;
         const decodedCredential = jwt_decode(userToken);
         console.log(`Logged in as ${decodedCredential.name}`);
-        post("/api/google-login", { token: userToken }).then((user) => {
-        //   setUserId(user._id);
-            setSuccess(user);
+        post("/api/google-login", { token: userToken }).then((res) => {
             post("/api/initsocket", { socketid: socket.id });
+            let hash= SHA256(username + "greenhouse" + new Date().toDateString())
+            localStorage.setItem('token', hash)
+            navigate(res.url, {replace: true})
         });
     };
 
 
     function handleSubmit(e) {
         post('/api/login', { username: username, password: password }).then(res => {
-            console.log(res)
-            setSuccess(res);
             post("/api/initsocket", { socketid: socket.id });
+            if (res.url === '/dashboard'){
+                let hash= SHA256(username + "greenhouse" + new Date().toDateString())
+                localStorage.setItem('token', hash)
+            }
+            navigate(res.url, {replace: true})
         }).catch(error => window.alert("incorrect username or password: " + error));    
         e.preventDefault();
     }
-
-    useEffect(() => {
-        if(success && !success.isVerified){
-            navigate(`/verify?email=${success.email}`, {replace: true});
-        } else if(success){
-            console.log("Succeeded! Redirecting...")
-            let hash= SHA256(username + "greenhouse" + new Date().toDateString())
-            localStorage.setItem('token', hash)
-            navigate('/dashboard', {replace: true});
-        }
-    }, [success]);
     
     return(
             
