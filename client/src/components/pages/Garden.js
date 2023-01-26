@@ -15,22 +15,27 @@ export default function Garden(props) {
     const [item, setItem] = useState(null);
 
     useEffect(() => {
+        socket.join(props.gardenId);
         socket.on("updated", (res) => {
             if (!("error" in res) && !res.error) {
                 setUser(res)
             }});
-        socket.on("garden:update", { title, completed: false }, (res) => {
+        socket.on("garden:update", (res) => {
             if (!("error" in res) && !res.error) {
                 setGarden(res)
             }});
-        socket.on("garden:delete", { title, completed: false }, (res) => {
+        socket.on("garden:delete", (res) => {
             if (!("error" in res) && !res.error) {
                 setGarden(res)
             }});
-        socket.on("garden:add", { title, completed: false }, (res) => {
+        socket.on("garden:add", (res) => {
             if (!("error" in res) && !res.error) {
                 setGarden(res)
             }});
+
+        () => {
+            socket.leave(props.gardenId)
+        }
         });
 
     // item object, position in Array

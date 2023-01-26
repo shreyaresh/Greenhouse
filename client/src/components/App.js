@@ -10,6 +10,7 @@ import Friends from "./pages/Friends.js";
 import { get, post } from "../utilities";
 import Verify from "./pages/Verify.js";
 
+
 const AuthLayout = () => {
     const isLoggedIn = localStorage.getItem('token') != null;
     if(isLoggedIn){

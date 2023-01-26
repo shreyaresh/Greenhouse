@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../Layout';
 import { get, post } from '../../utilities';
-import { socket } from '../../client-socket';
+import { socket } from  '../../client-socket';
 
 export default function Friends() {
     const [friendName, setFriendName] = useState('');
@@ -9,14 +9,16 @@ export default function Friends() {
     const [requests, setRequests] = useState([]);
     const [friends, setFriends] = useState([]);
 
+    
+
     function handleSubmit(e){
         e.preventDefault();
         post('/api/make-request', {type: 'friend-request', to: friendName}).then((res) => {
             if(res.status === 200){
                 console.log('hello!')
-                setMessage(res);
+                setMessage(res.msg);
             } else {
-                setMessage(res);
+                setMessage(res.err);
             }
         }).catch(res => {
             if(res.err){
@@ -28,7 +30,15 @@ export default function Friends() {
     }
 
     useEffect(() => {
-        
+        socket.on("updated", function (res) {
+            if (!(res.err)) {
+                setFriends(res.friends);
+                get('/api/requests', {type: 'friend-request'}).then(res => {
+                    setRequests(res)
+                }).catch(res => console.log(res));
+        }});
+
+
         get('/api/requests', {type: 'friend-request'}).then(res => {
             console.log(res)
             setRequests(res)
@@ -39,27 +49,18 @@ export default function Friends() {
             setFriends(res)
         }).catch(res => console.log(res))
 
-
-        socket.on("updated", (res) => {
-            if (!("error" in res)) {
-                setFriends(res.friends);
-                get('/api/requests', {type: 'friend-request'}).then(res => {
-                    console.log(res)
-                    setRequests(res)
-                }).catch(res => console.log(res));
-        }});
-
         return () => {
             socket.removeAllListeners();
         }
-    }, []);
+    }, [socket]);
 
     function handleAction(e, status, id){
         e.preventDefault();
         post('/api/handle-request', {status: status, type: 'friend-request', type_id: id}).then(res => {
             console.log(res)
-        }).get('/api/requests', {type: 'friend-request'})
-        .then(res => setFriends(res))
+        })
+        get('/api/requests', {type: 'friend-request'})
+        .then(res => setRequests(res))
         .catch(res => console.log(res));
     }
 

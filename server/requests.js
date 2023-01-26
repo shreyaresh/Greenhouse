@@ -23,7 +23,7 @@ async function makeRequest (req, res) {
     const requestType = ((req.body.type === "friend-request") ? FriendRequest : GardenRequest);
 
     console.log(req.user)
-    
+
     if (!req.user) {
         console.log('failed at login')
         return res.status(400).send({err: "Must be logged in."})
@@ -84,7 +84,6 @@ async function handleRequest (req, res) {
     const requestId = req.body.type_id;
     const requestIdField = ((req.body.type === "friend-request") ? "friendReqId" : "gardenReqId");
     const request = await requestType.findOne({[requestIdField]: requestId});
-    console.log(request);
     const userFrom = await User.getUser(request.userIdFrom);
     const userTo = await User.getUser(request.userIdTo);
     const addToField = ((req.body.type === "friend-request") ? "friends" : "gardenIds");

@@ -30,7 +30,7 @@ const removeUser = (user, socket) => {
 };
 
 // move from one location to another
-async function gardenItemUpdate (payload, callback) {
+async function gardenItemUpdate (payload) {
   const socket = this;
   const gardenSchema = Joi.object({
     gardenId: Joi.string(),
@@ -92,7 +92,7 @@ async function gardenItemUpdate (payload, callback) {
   }
 }
 
-async function gardenItemAdd(payload, callback) {
+async function gardenItemAdd(payload) {
   const socket = this;
   const gardenSchema = Joi.object({
     gardenId: Joi.string(),
@@ -177,7 +177,7 @@ async function gardenItemAdd(payload, callback) {
   }
 }
 
-async function gardenItemDelete (payload, callback) {
+async function gardenItemDelete (payload, res) {
   const socket = this;
   const gardenSchema = Joi.object({
     gardenId: Joi.string(),
@@ -224,41 +224,11 @@ async function gardenItemDelete (payload, callback) {
   }
 }
 
-// join ROOMS after /login or /google-login or /create-garden for both users
-async function joinRooms (payload) {
-  const socket = this;
-  const userSchema = Joi.object({
-    userId: Joi.string()
-  });
-   const { error, value } = userSchema.tailor("create").validate(payload, {
-    abortEarly: false, // return all errors and not just the first one
-    stripUnknown: true, // remove unknown attributes from the payload
-  });
 
-  if (error) {
-    return callback({
-      error: "Invalid payload.",
-      errorDetails: error.details,
-    });
-  } 
-
-  try {
-    const user = await User.findById(payload.userId);
-  } catch {
-    return callback({
-      error: "Couldn't access user.",
-      errorDetails: error.details,
-    });
-  }
-
-  if (user.gardenIds.length) {
-    for (const id of user.gardenIds) {
-      if(socket.rooms.includes(id)) {
-        socket.join(id);
-      }
-    }
-  }
-}
+User.watch([{ $match: {operationType: {$in: ['update']}}}], {fullDocument: 'updateLookup'}).
+      on('change', data => {
+        ((getSocketFromUserID(String(data.fullDocument._id))) ? getSocketFromUserID(String(data.fullDocument._id)).emit("updated", data.fullDocument) : null);
+      });
 
 module.exports = {
   init: (http) => {
@@ -266,22 +236,7 @@ module.exports = {
     
     io.on("connection", (socket) => {
 
-      User.watch([{ $match: {operationType: {$in: ['insert']}}}], {fullDocument: 'updateLookup'}).
-      on('change', data => {
-          console.log('Insert action triggered');
-          console.log(new Date(), data.fullDocument);
-5        });
-      User.watch([{ $match: {operationType: {$in: ['update']}}}], {fullDocument: 'updateLookup'}).
-      on('change', data => {
-        console.log('Update action triggered');
-        console.log(new Date(), data.fullDocument);
-        console.log(`User: ${data}`)
-        ((getSocketFromUserID(data.fullDocument._id)) ? getSocketFromUserID(data.fullDocument._id).emit("updated", data.fullDocument) : null);
-      });
-
       console.log(`socket has connected ${socket.id}`);
-      socket.on("joinRoom", joinRooms);
-      socket.on("leaveRoom", function (payload) {socket.leave(payload.gardenId)});
       socket.on("garden:update", gardenItemUpdate);
       socket.on("garden:add", gardenItemAdd);
       socket.on("garden:delete", gardenItemDelete);
