@@ -29,26 +29,86 @@
         flex-direction: row;
         justify-content: center;
         // align-items: center;
-        column-gap:2rem;
+        column-gap:5rem;
         height:auto;
         width:100%;
     }
 
+    .message {
+        @if error {
+            color: $error
+        } @else {
+            color: $greener
+        }
+    }
+
+
+    .friends-list {
+
+        column-gap: 2rem;
+    }
+
     .column {
         // height:100%;
-        padding:1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding:2rem;
         width:min(40%, 500px);
         border-radius:30px;
         background-color:$pastel-green;
+        gap: 1rem;
+
 
         .request {
-            padding:1rem;
+            display: inline-flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 90%;
+            padding:0.5rem;
             background-color:$white;
             border-radius:10px;
+            color: $greener;
+            &:hover {
+                background-color: #e1eee1;
+                color: adjust-hue($color: #000000, $degrees: 2)
+            }
 
+            .do-delete {
+                height: 80%;
+                width:auto;
+            }
+            .actions {
+                display: inline-flex;
+                width: 50%;
+                justify-content: flex-end;
+            }
             .requester {
+                display: inline-flex;
+                align-items: center;
                 font-size:1.4rem;
                 font-weight:600;
+                text-align: center;
+                padding-left: 1rem;
+            }
+
+            .button-wrapper {
+                display: inline-block;
+                padding-left:1rem;
+                padding-right:1rem;
+            }
+
+            button {
+                height:100%;
+                background-color:$yellow;
+                cursor: pointer;
+                border-style: none;
+                color: $greenest;
+                border-radius:10px;
+                &:hover {
+                    background-color: $greener;
+                }
+
             }
         }
     }

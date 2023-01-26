@@ -91,6 +91,12 @@ router.get("/friends", async (req, res) => {
     const user = await User.findById(req.user._id);
     return res.send(user.friends);
   }});
+
+router.get("/notifications", async (req, res) => {
+    if (req.user) {
+      const user = await User.findById(req.user._id);
+      return res.send(user.notifications);
+    }});
 router.get("/gardens-with", requests.gardensWith);
 router.get("/requests", async (req, res) => {
   const requestType = ((req.query.type === 'friend-request') ? FriendRequest : GardenRequest);
@@ -110,7 +116,7 @@ router.get("/all-gardens", async (req, res) => {
         let gardenObj = await Garden.findById(gardenId);
         let friend_id  = gardenObj.userIds.filter(function (el) {return el !== String(req.user._id);})
         const friend = await User.findById(friend_id);
-        gardenProps.push([gardenObj.name, gardenId, gardenObj.isVerified, friend.name]);
+        gardenProps.push([gardenObj.img, gardenObj.name, gardenId, gardenObj.isVerified, friend.name]);
         }
     }    
     return res.status(200).send(gardenProps);

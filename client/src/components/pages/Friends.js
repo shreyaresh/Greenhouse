@@ -1,33 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import Layout from '../Layout';
 import { get, post } from '../../utilities';
-import { socket } from  '../../client-socket';
+import { socket } from '../../client-socket';
+import x from '../../public/x.png';
 
 export default function Friends() {
     const [friendName, setFriendName] = useState('');
     const [message, setMessage] = useState('');
     const [requests, setRequests] = useState([]);
     const [friends, setFriends] = useState([]);
+    const [color, setColor] = useState('#6f8531')
 
-    
+
 
     function handleSubmit(e){
         e.preventDefault();
         post('/api/make-request', {type: 'friend-request', to: friendName}).then((res) => {
             if(res.status === 200){
-                console.log('hello!')
                 setMessage(res.msg);
+                setColor('#6f8531');
             } else {
-                setMessage(res.err);
+                setMessage(res.err)
+                setColor('#FF6961');
             }
         }).catch(res => {
             if(res.err){
-                setMessage(res.err);
+                setMessage(res.err)
+                setColor('#FF6961');
             } else {
-                setMessage(res.msg);
+                setMessage(res.msg)
+                setColor('#6f8531');
             }
-        });
+        })
     }
+
+    useEffect(() => {
+        setTimeout(setMessage(''), 1000);
+        return () => {}
+    }, [handleSubmit]);
+
 
     useEffect(() => {
         socket.on("updated", function (res) {
@@ -57,12 +68,33 @@ export default function Friends() {
     function handleAction(e, status, id){
         e.preventDefault();
         post('/api/handle-request', {status: status, type: 'friend-request', type_id: id}).then(res => {
-            console.log(res)
+            console.log(res);
+            if (res.err) {
+                setMessage(res.err);
+                setColor('#6f8531');
+            } else if (res.msg){
+                setMessage(res.msg);
+                setColor('#FF6961');
+            }
+
         })
         get('/api/requests', {type: 'friend-request'})
         .then(res => setRequests(res))
         .catch(res => console.log(res));
     }
+
+    function handleDelete(username) {
+        post('/api/delete-friend', {username : username})
+        .then(get('/api/friends')).then((res) => setFriends(res))
+        .catch(res => console.log(res))
+    }
+
+    // function handleDisplay(bool) {
+    //     if (bool) {
+    //         setDisplay('displayed')
+    //     }
+    //     setDisplay('notdisplayed')
+    // }
 
     return(
         <Layout loggedIn={true}>
@@ -74,14 +106,14 @@ export default function Friends() {
                             value={friendName} onChange={(e) => setFriendName(e.target.value)}/>
                         <input type="submit" value="Submit"/>
                     </form>
-                    {message}
+                    <p style={{'color': `${color}`}}>{message}</p>
                 </div>
                 <div className="columns-wrap">
                     <div className="column friend-list">
                         <h2>Friends</h2>
                         { (friends.length) ? friends.map((req, index) => {
                             return(
-                                <div className="request" key={index}>
+                                <div className="request" key={index} onMouseEnter={(e) =>handleDisplay(true)} onMouseLeave={(e) => handleDisplay(false)}>
                                     <div className="requester">{req.username}</div>
                                 </div>
                             )
@@ -94,8 +126,12 @@ export default function Friends() {
                                 <div className="request" key={index}>
                                     <div className="requester">{req.usernameFrom}</div>
                                     <div className="actions">
-                                        <button onClick={(e) => handleAction(e, '2', req.friendReqId)}>accept</button>
-                                        <button onClick={(e) => handleAction(e, '3', req.friendReqId)}>reject</button>
+                                        <div className="button-wrapper">
+                                            <button onClick={(e) => handleAction(e, '2', req.friendReqId)}>accept</button>
+                                        </div>
+                                        <div className="button-wrapper">
+                                            <button onClick={(e) => handleAction(e, '3', req.friendReqId)}>reject</button>
+                                        </div>
                                     </div>
                                 </div>
                             )

@@ -3,9 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { get, post} from '../utilities';
 import { googleLogout } from "@react-oauth/google";
 import Logo from '../public/small-logo.png';
+import NotifIcon from '../public/notifIcon.png'
+import Notifications from './pages/popups/Notifications';
 
 export default function Navbar({loggedIn}) {
     const [success, setSuccess] = useState(false);
+    const [clicked, setClicked] = useState(false);
     const navigate = useNavigate();
   
     function logout(e) {
@@ -16,6 +19,15 @@ export default function Navbar({loggedIn}) {
         e.preventDefault();
     }
 
+    function loadNotifs (e) {
+        if (clicked) {
+            setClicked(false);
+        } else {
+            setClicked(true);
+        }
+        e.preventDefault()
+        }
+
     useEffect(() => {
         if(success){
             localStorage.removeItem('token')
@@ -24,6 +36,7 @@ export default function Navbar({loggedIn}) {
     }, [success]);
 
     return(
+        <div className='all-wrapper'>
         <div id="navbar">
             <a href={loggedIn ? "/dashboard" : "/"}>
                 <div className="logo-wrap">
@@ -31,14 +44,21 @@ export default function Navbar({loggedIn}) {
                     greenhouse
                 </div>
             </a>
+            
             <div className="links">
+            {loggedIn ? <img src={NotifIcon} alt='notification icon' className='logo' onClick={loadNotifs}></img> : null}
             {loggedIn ? ['Dashboard','Friends','Profile'].map(el => {
                 return(
-                    <a key={el} href={`/${el.toLowerCase()}`}>{el}</a>
+                    <a className="link" key={el} href={`/${el.toLowerCase()}`}>{el}</a>
                 )
             }) : null }
-            {loggedIn ? <a href="/" onClick={logout}>Logout</a> : null}
+            {loggedIn ? <a className="link" href="/" onClick={logout}>Logout</a> : null}
             </div>
+        </div>
+        {((loggedIn && clicked) ? 
+            <div className = "notifs-wrapper">
+                <Notifications/>
+                </div>: null)}
         </div>
     )
 }

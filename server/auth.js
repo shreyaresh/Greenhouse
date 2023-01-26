@@ -69,7 +69,7 @@ async function sendVerifyCode (email) {
 
 async function newVerifyCode (req, res) {
   if (await Login.getEmail(req.body.email)) {
-    return res.send(auth.sendVerifyCode(req.body.email));
+    return res.send(await sendVerifyCode(req.body.email));
   }
    return res.send({err: "Email is not registered yet."});
 }

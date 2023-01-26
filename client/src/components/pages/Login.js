@@ -36,7 +36,7 @@ export default function Login() {
                 localStorage.setItem('token', hash)
             }
             navigate(res.url, {replace: true})
-        }).catch(setMessage("incorrect username or password!"));    
+            }).catch(setTimeout(() => setMessage("username or password is incorrect!"), 1000))
         e.preventDefault();
     }
     

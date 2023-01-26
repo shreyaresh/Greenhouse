@@ -100,7 +100,8 @@ async function handleRequest (req, res) {
                 dateCreated: new Date(),
                 isVerified: false,
                 lastVisited: null,
-                items: []
+                items: [],
+                img: Math.floor(Math.random()*3) + 1
             });
             newGarden.save();
             await User.findByIdAndUpdate(userFrom._id, { $addToSet: { [addToField]: newGarden._id}});

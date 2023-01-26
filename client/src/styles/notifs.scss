@@ -1,0 +1,75 @@
+#notifs-wrapper {
+    display:flex;
+    max-height: 60vh;
+    flex-direction: column;
+    background-color: $pastel-green;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 20px;
+    padding: 10px;
+    align-items: center;
+    
+    h2 {
+        color: $greenest
+    }
+    .notification-list {
+        display: inline-flexbox;
+        overflow-y:auto;
+        flex-direction: column;
+        align-items: center;
+        height:80%;
+        border-radius: 25px;
+    }  
+
+}
+
+.clearButton {
+    width: 90%;
+    // display: flex;
+    // justify-content:center;
+    // width:90%;
+    // background-color:$yellow;
+    // border-radius:30px;
+    // &:hover {
+    //     background-color:$green;
+    // }
+}
+
+.show-text {
+    cursor: pointer;
+    text-decoration: underline;
+    color: $greener;
+    &:hover {
+        color: $green;
+    }
+}
+.notif {
+    width: 90%;
+    display: inline-block;
+    background-color: $white;
+    border-radius: 15px;
+    align-items: flex-start;
+    flex-direction: column;
+    text-justify: left;
+    padding: 10px;
+}
+.date {
+    width:80%;
+    color: $greenest;
+    font-size:1rem;
+}
+.message{
+    color: $greener;
+}
+
+button {
+    width:100%;
+    padding: 1rem;
+    background-color:$yellow;
+    cursor: pointer;
+    border-style: none;
+    color: $greenest;
+    border-radius:10px;
+    &:hover {
+        background-color:$green;
+    }
+}

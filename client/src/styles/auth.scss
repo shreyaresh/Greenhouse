@@ -27,6 +27,9 @@ form {
             background-color:$yellow;
             font-weight:600;
             cursor:pointer;
+            &:hover {
+                background-color: $green;
+            }
         }
     }
 }

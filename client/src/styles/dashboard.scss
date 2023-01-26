@@ -1,7 +1,19 @@
 #dashboard {
-    height:100vh;
     display:flex;
-    flex-direction:column;
-    justify-content: center;
+    flex-direction: row;
     align-items: center;
+    justify-content: flex-start;
+    width:100%;
+    padding:2rem;
+    margin-top:6rem;
+    height:100%;
+    row-gap:2rem;
+
+    .friends-component {
+        display: inline-flex;
+        width:max(40vw, 40%);
+        height:fit-content
+    }
+
+
 }

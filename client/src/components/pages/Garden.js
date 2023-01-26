@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../Layout';
 import { get, post } from '../../utilities';
-import { useNavigate } from 'react-router';
-import socket from "../../client-socket";
+import { useNavigate , useParams} from 'react-router-dom';
+import { socket } from "../../client-socket";
 import $ from "jquery";
 
 export default function Garden(props) {

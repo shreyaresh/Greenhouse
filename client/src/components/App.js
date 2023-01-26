@@ -9,6 +9,8 @@ import Register from "./pages/Register.js";
 import Friends from "./pages/Friends.js";
 import { get, post } from "../utilities";
 import Verify from "./pages/Verify.js";
+import Garden from "./pages/Garden.js"
+
 
 
 const AuthLayout = () => {
@@ -46,7 +48,6 @@ const App = () => {
   }, []);
 
   return (
-    <>
       <Router>
           <Switch>
                 <Route exact path="/" element={<Landing/>}/>
@@ -58,6 +59,7 @@ const App = () => {
                 <Route element={<AuthLayout/>}>
                     <Route path="/dashboard" element={<Dashboard/>}/>
                     <Route path="/friends" element={<Friends/>}/>
+                    {/* <Route path="/garden/:id" element={<Garden/>}/> */}
                 </Route>
             
                 <Route path="*" element={<NotFound/>}/>
@@ -67,7 +69,6 @@ const App = () => {
         <Login path="/login" handleLogin={handleLogin} userId={userId} />
         <Register path="/register" userId={userId} /> */}
       </Router>
-    </>
   );
 };
 
