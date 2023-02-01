@@ -9,17 +9,17 @@ async function createGarden (req, res) {
     const gardenName = req.body.name;
     const gardenObj = await Garden.findById(gardenId);
     // change to garden object in later iterations, hardcode for now
-    const gardenRadius = 4;
+    const gardenRadius = 9;
     
     if (gardenObj.isVerified){
         return res.status(400).send({err : "The garden is already initialized!"})
     };
 
-    if (Math.abs(parseInt(req.body.x_pos)) > gardenRadius || Math.abs(parseInt(req.body.y_pos)) > gardenRadius ) {
+    if (req.body.x_pos > gardenRadius || req.body.y_pos > gardenRadius ) {
         return res.status(400).send({err : "The selected location is outside garden area."})
     }
 
-    if (gardenObj.items.length && gardenObj.items[0].userId === req.user._id) {
+    if (gardenObj.items.length && gardenObj.items[0].userId === String(req.user._id)) {
         return res.status(400).send({ err: `You've already chosen your plant!` })
     };
 
@@ -32,6 +32,8 @@ async function createGarden (req, res) {
         growthStage: 1
         }
     }});
+
+    await Garden.findByIdAndUpdate(gardenId, {name : gardenName});
 
 
     if (gardenObj.items.length + 1 === 2){

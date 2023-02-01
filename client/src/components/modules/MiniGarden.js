@@ -1,8 +1,11 @@
+import React from 'react';
 import empty from '../../public/empty-garden.png';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import hyacinth from '../../public/hyacinth.png';
 import lilies from '../../public/lilies.png';
-
+import hydrangeas from '../../public/hydrangeas.png';
+import sunflower from '../../public/sunflowers.png';
 
 let itemPosition = [4,4];
 let observer = null;
@@ -12,19 +15,18 @@ function emitChange() {
 }
 
 export function observe(o) {
-  if (observer) {
-    console.log(observer);
-    throw new Error('Multiple observers not implemented.');
-  }
-
   observer = o
   emitChange()
 }
 
-function Board({position}) {
+
+function Board({position, plant}) {
+
+  const chosenMap = {'8b494f1f-aa63-4134-a2fa-f6f07216a448': hyacinth, 'e0fd2b8a-3585-4380-ba79-d5ca524fdebe': sunflower, '5540a077-31bd-41de-8ef1-da91b7dbb289': hydrangeas, '68e272d4-caa1-416d-85b6-dbfd01c97f16': lilies}
 
   const plotHeight = 8;
   const plotWidth=8;
+
 
 
 function Item() {
@@ -49,7 +51,7 @@ function Item() {
         alignItems:'flex-end'
       }}
     >
-    <img src={lilies} alt='lilies'></img> 
+    <img src={chosenMap[plant]} alt='plant'></img> 
     </div>
   );
 };
@@ -147,7 +149,7 @@ return (
 
 
 // array of positions
-export function MiniGarden({position}) {
+export function MiniGarden({position, plant}) {
   return (
-    <Board position={position}></Board>
+    <Board position={position} plant={plant}></Board>
   )};

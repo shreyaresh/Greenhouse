@@ -27,9 +27,7 @@ export default function GardensModule({gardens}) {
         })
     }
 
-    useEffect(()=>{
-        setTimeout(()=> setGreyedOut({grey: false, message:''}), 3000);
-    }, [])
+    setTimeout(()=> setGreyedOut({grey: false, message:''}), 5000);
 
     return(
        <div id = 'gardensModule'>
@@ -38,7 +36,7 @@ export default function GardensModule({gardens}) {
                 { (gardens.length) ? 
                     gardens.map((req, index) => {
                         const mapping = {1: "1", 2: two, 3:three}; 
-                        if (!req[1]){
+                        if (req[1] === ''){
                             req[1] = "Choose your garden name here!";
                         };
                         console.log(req)
@@ -49,6 +47,9 @@ export default function GardensModule({gardens}) {
                                 </div>
                                 <h3>{req[1]}</h3>
                                 <p>Garden with {req[4]}</p>
+                                {(greyedOut.grey ? <div className="grey">
+                                    {greyedOut.message}
+                                    </div>:<></>)}
                             </div>
                             )
                     }) 

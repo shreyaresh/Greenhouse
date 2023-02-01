@@ -11,12 +11,23 @@
     -moz-box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
     box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
     
+    .grey {
+        position: absolute;
+        display: flex;
+        height: 100%;
+        width:100%;
+        border-radius: 25px;
+        background-color: rgba(0,0,0,0.3);
+        color: $white;
+        justify-content: center;
+        align-items: center;
+    }
 
     h2 {
         font-weight: 600;
         font-size: 2rem;
         color: $greenest;
-        text-align: left;
+        text-align: center;
         padding-left:30px
     }
     
@@ -28,7 +39,6 @@
         display: inline-flex;
         flex-direction: row;
         align-items: center;
-        height:90%;
         border-radius: 25px;
         gap: 1rem;
         overflow-x: scroll;
@@ -62,6 +72,7 @@
 
 
     .garden {
+        position: relative;
         cursor: pointer;
         display: inline-flex;
         height: 90%;
