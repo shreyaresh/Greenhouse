@@ -20,7 +20,7 @@ export default function Register() {
 
     useEffect(() => {
         if(success) {
-            navigate(`/verify?email=${email}`, { replace: true});
+            navigate(`/verify`, { email: email, replace: true});
         }
     }, [success]);
 

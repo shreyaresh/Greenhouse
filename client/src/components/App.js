@@ -10,6 +10,7 @@ import Friends from "./pages/Friends.js";
 import { get, post } from "../utilities";
 import Verify from "./pages/Verify.js";
 import Garden from "./pages/Garden.js"
+import CreateGarden from "./pages/CreateGarden.js";
 
 
 
@@ -59,15 +60,13 @@ const App = () => {
                 <Route element={<AuthLayout/>}>
                     <Route path="/dashboard" element={<Dashboard/>}/>
                     <Route path="/friends" element={<Friends/>}/>
+                    <Route path="/create-garden" element={<CreateGarden />} />
+                    <Route path="/create-garden/:garden" element={<CreateGarden/>} />
                     {/* <Route path="/garden/:id" element={<Garden/>}/> */}
                 </Route>
             
                 <Route path="*" element={<NotFound/>}/>
           </Switch>
-        {/* <Landing path="/" userId={userId} />
-        <Dashboard path="/dashboard" userId={userId} handleLogout={handleLogout} />
-        <Login path="/login" handleLogin={handleLogin} userId={userId} />
-        <Register path="/register" userId={userId} /> */}
       </Router>
   );
 };

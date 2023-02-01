@@ -1,0 +1,48 @@
+#garden-container {
+    display:flex;
+    position: relative;
+    width:500px;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 10px;
+    height:600px;
+  
+  
+  .element-grid {
+    position: absolute;
+    top: 19px;
+    display:grid;
+    width: 300px;
+    height:100px;
+    grid-template-areas: 
+    "a a a a a a a a"
+    "a a a a a a a a"
+    "a a a a a a a a"
+    "a a a a a a a a"
+    "a a a a a a a a"
+    "a a a a a a a a"
+    "a a a a a a a a"
+    "a a a a a a a a";
+    transform:skewX(-58deg);
+    -ms-transform:skewX(-58deg); /* IE 9 */
+    -moz-transform:skewX(-58deg); /* Firefox */
+    -webkit-transform:skewX(-58deg); /* Safari and Chrome */
+    -o-transform:skewX(-58deg); /* Opera */
+  }
+  
+  img {
+    width:100%;
+    position: absolute;
+  }
+  
+  .element-grid div {
+    height: 100%;
+    width: 100%;
+  }
+  
+  .square:hover {
+    background-color: #ffffff;
+    border-radius: 10px;
+    opacity: 0.5;
+  }
+}

@@ -86,6 +86,16 @@ router.post("/handle-request", requests.handleRequest);
 router.post("/make-request", requests.makeRequest);
 router.post("/delete-friend", requests.deleteFriend);
 router.post("/delete-garden", requests.deleteGarden);
+router.get("/garden-status", async (req, res) => {
+  const garden = await Garden.findById(req.query.gardenId);
+  if (garden.isVerified) {
+    return res.status(200).send({msg : "Garden already initialized"});
+  }  if (garden.items.find(e => e.userId === req.user._id)) {
+    return res.status(200).send({msg: "Wait for your partner to select a plant"})
+  } return res.status(200).send({msg: "Select a plant"});
+  
+})
+
 router.get("/friends", async (req, res) => {
   if (req.user) {
     const user = await User.findById(req.user._id);
@@ -106,10 +116,9 @@ router.get("/requests", async (req, res) => {
   return res.status(400).send({err : "Not logged in."})
 });
 
-// returns garden name, garden id, verified status, and friend name of all of the session user's gardens
+// returns img name, garden name, garden id, verified status, and friend name of all of the session user's gardens
 router.get("/all-gardens", async (req, res) => {
   if (req.user) {
-    let gardenObj;
     let gardenProps = [];
     if (req.user.gardenIds.length) {
       for (const gardenId of req.user.gardenIds) {

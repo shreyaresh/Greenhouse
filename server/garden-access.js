@@ -33,7 +33,6 @@ async function createGarden (req, res) {
         }
     }});
 
-    console.log(`Garden object: ${gardenObj}`);
 
     if (gardenObj.items.length + 1 === 2){
         await Garden.findByIdAndUpdate(gardenId, {isVerified : true, dateVerified: new Date()});
@@ -74,5 +73,3 @@ module.exports = {
     createGarden,
     gardenAccess
 };
-// sockets for in-game play
-// TO DO: add socket for adding and removing items
