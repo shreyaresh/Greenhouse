@@ -21,6 +21,12 @@ html,body {
     transition: all $t-dur ease-out;
 }
 
+#root {
+    position:relative;
+    height: 100%;
+    width: 100%;
+}
+
 .landing-container {
     height: 50%;
     max-width: 80%;

@@ -12,7 +12,6 @@ export default function FriendsModule({friends}) {
     const [results, setResults] = useState([]);
     const [send, setSend] = useState('');
     const [filteredResults, setFilteredResults] = useState([]);
-    const [open, setOpen] = useState({open:false, friend:'', friendId:''})
 
     function loadAll (e) {
         if (long) {

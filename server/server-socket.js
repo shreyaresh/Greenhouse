@@ -81,7 +81,6 @@ async function gardenItemUpdate (payload) {
       }],
     new: true,
     useFindAndModify: false});
-    console.log("garden updated: ", updatedGarden);
     return { msg : "Success!", doc : updatedGarden};
 
   } catch {
@@ -92,11 +91,9 @@ async function gardenItemUpdate (payload) {
 }
 
 async function gardenItemAdd(payload) {
-  const socket = this;
   const gardenSchema = Joi.object({
     gardenId: Joi.string(),
     userId: Joi.string(),
-    growthTime: Joi.number(),
     position_x: Joi.number(),
     position_y: Joi.number(),
     item_id: Joi.string(),
@@ -155,24 +152,28 @@ async function gardenItemAdd(payload) {
     }
    
 
-  // to consider: user can take an item out and essentially reset growth time periodically
   try {
+    const enough = await User.find({_id: payload.userId, "inventory.item_id": payload.item_id, "inventory.growthStage" : payload.growthStage, "inventory.quantity": {$gt : 0}})
+    if (!enough.length) {
+      return { error: "Not enough items"};
+    }
     await User.findByIdAndUpdate(payload.userId, {$inc: {"inventory.$[item].quantity" : -1}}, {arrayFilters: [{
-      "item.item_id": item_id,
-      "item.growthStage": payload.growthStage,
-      "item.growthStage": payload.growthTime
-    }]})
-    const updatedGarden = await Garden.findByIdAndUpdate(payload.gardenId,
+      "item.item_id": payload.item_id,
+      "item.growthStage": payload.growthStage
+    }], useFindAndModify: false})
+
+    const updatedGarden = await Garden.findOneAndUpdate({_id: payload.gardenId},
       { $addToSet : {items : {
-        userId: userId,
-        growthTime: growthTime,
-        position_x: position_x,
-        position_y: position_y,
-        item_id: item_id,
-        growthStage: growthStage
+        userId: payload.userId,
+        position_x: payload.position_x,
+        position_y: payload.position_y,
+        item_id: payload.item_id,
+        growthStage: payload.growthStage
       }}},
-      {new:true}); 
-      socket.to(payload.gardenId).emit('garden:add', updatedGarden);
+      {new:true,
+      useFindAndModify: false}); 
+      return {msg: "Success", doc: updatedGarden}
+    
   } catch {
     return {
       error: "Unable to query and update for new item.",
@@ -181,12 +182,10 @@ async function gardenItemAdd(payload) {
 }
 
 async function gardenItemDelete (payload) {
-  const socket = this;
   const gardenSchema = Joi.object({
     gardenId: Joi.string(),
     userId: Joi.string(),
     userIdCurrent: Joi.string(),
-    growthTime: Joi.number(),
     position_x: Joi.number(),
     position_y: Joi.number(),
     item_id: Joi.string(),
@@ -212,29 +211,50 @@ async function gardenItemDelete (payload) {
   };
 
   try{
-   const updatedDoc = await User.findByIdAndUpdate(payload.userId, {$inc: {"inventory.$[item].quantity" : 1}}, {arrayFilters: [{
-    "item.item_id": item_id,
-    "item.growthStage": payload.growthStage,
-    "item.growthStage": payload.growthTime
-  }]}, 
-    {new: true});
-    socket.emit("updated", {userId: payload.userId});
-    socket.to(payload.gardenId).emit('garden:delete', updatedDoc);
-  } catch {
+
+    const exists = await User.findOne({_id: payload.userId, "inventory.item_id": payload.item_id, "inventory.growthStage": payload.growthStage});
+
+    if (!exists) {
+      await User.findByIdAndUpdate(payload.userId, 
+        {$push: {inventory:  {
+        item_id: payload.item_id,
+        growthStage: payload.growthStage,
+        quantity: 1
+      }}}, {new:true});
+    } else {
+      await User.findOneAndUpdate({_id: payload.userId}, 
+        {$inc: {"inventory.$[item].quantity" : 1}},
+        {arrayFilters: [{
+        "item.item_id": payload.item_id,
+        "item.growthStage": payload.growthStage
+      }], 
+        useFindAndModify: false});
+    }
+
+    const updatedDoc = await Garden.findOneAndUpdate({_id: payload.gardenId},
+      {$pull : {items: {item_id : payload.item_id, position_x: payload.position_x, position_y: payload.position_y}}},
+      {new: true,
+      useFindAndModify: false})
+
+    return {msg: "Success", doc: updatedDoc}
+  } catch(err) {
     return {
-      err: "Unable to query and update item."
+      err: "Unable to query"
     }
   }
 }
 
-
-User.watch([{ $match: {operationType: {$in: ['update']}}}], {fullDocument: 'updateLookup'}).
-      on('change', data => {
-        ((getSocketFromUserID(String(data.fullDocument._id))) ? getSocketFromUserID(String(data.fullDocument._id)).emit("updated", data.fullDocument) : null);
-      });
-
 module.exports = {
   init: (http) => {
+
+    User.watch([{ $match: {operationType: {$in: ['update']}}}], {fullDocument: 'updateLookup'}).
+      on('change', data => {
+        ((getSocketFromUserID(String(data.fullDocument._id))) ? 
+        getSocketFromUserID(String(data.fullDocument._id)).emit("updated", data.fullDocument) 
+        : null);
+      });
+
+
     io = require("socket.io")(http);
     
     io.on("connection", (socket) => {
@@ -251,14 +271,27 @@ module.exports = {
       socket.on("garden:update", async (payload) => {
         res = await gardenItemUpdate(payload)
         if (res.doc) {
-          console.log(res.msg)
           io.in(payload.gardenId).emit('garden:update', res.doc);
         } else {
           console.log(res.err)
         }
       });
-      socket.on("garden:add", async (payload) => {await gardenItemAdd(payload)});
-      socket.on("garden:delete", async (payload) => {await gardenItemDelete(payload)});    
+      socket.on("garden:add", async (payload) => {
+        res = await gardenItemAdd(payload)
+        if (res.doc) {
+          io.in(payload.gardenId).emit('garden:add', res.doc);
+        } else {
+          console.log(res.err)
+        }
+      });
+      socket.on("garden:delete", async (payload) => {
+        res = await gardenItemDelete(payload)
+        if (res.doc) {
+          io.in(payload.gardenId).emit('garden:delete', res.doc);
+        } else {
+          console.log(res.err)
+        }
+      });    
   
 
       socket.on("disconnect", (reason) => {

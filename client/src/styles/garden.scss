@@ -1,11 +1,38 @@
-.garden-page-container {
+#garden-page-container {
     overflow-y: auto;
     display:flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
-    width:100%;
+    justify-content: space-evenly;
     padding:2rem;
-    margin-top:6rem;
+    width:100%;
     height:100%;
+    
+    .left-els {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 4vh;
+        justify-content: center;
+        align-items: center;
+        color: $white;
+        
+        .plot {
+            border: solid 10px $pastel-yellow;
+            border-radius: 25px;
+            padding: 20px;
+            -webkit-box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
+            -moz-box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
+            box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
+        }
+        .title {
+            border-radius: 20px;
+            background-color: $green;
+            padding: 10px;
+            padding-left: 30px;
+            padding-right: 30px;
+            -webkit-box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
+            -moz-box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
+            box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
+        }
+    }
 }

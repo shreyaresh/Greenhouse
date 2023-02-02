@@ -6,7 +6,6 @@ const Friend = new mongoose.Schema({
 });
 
 const Item = new mongoose.Schema({
-  growthTime: Number,
   item_id: String,
   growthStage: Number,
   quantity: Number

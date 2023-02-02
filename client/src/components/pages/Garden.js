@@ -1,16 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import { get } from '../../utilities';
-import { Plot } from '../modules/gamefiles/Plot.js';
+import { Inventory, Plot } from '../modules/gamefiles/Plot.js';
 import { useLocation } from 'react-router-dom';
-import { Inventory } from '../modules/gamefiles/Inventory.js';
 import Layout from '../Layout.js';
 import { socket } from '../../client-socket.js';
 
 export default function Garden () {
 
     const gardenId = useLocation().state.gardenId;
-    const [items, setItems] = useState([])
-    const [user, setUser] = useState({})
+    const [items, setItems] = useState([]);
+    const [user, setUser] = useState({});
+    const [name, setName] = useState('');
+    const [inventory, setInventory] = useState([]);
+
 
     useEffect(() => {
 
@@ -20,7 +22,11 @@ export default function Garden () {
         .then((res) => setUser(res._id))
         
         get('/api/garden', {gardenId : gardenId})
-        .then((res) => setItems(res.items))
+        .then((res) => {setItems(res.items); setName(res.name)})
+
+        get('/api/items')
+        .then((res) => setInventory(res))
+
 
         socket.on("garden:add", (res) => {
             if(!res.error){
@@ -39,10 +45,18 @@ export default function Garden () {
         })
     
         socket.on("garden:delete", (res) => {
+            console.log('received response: ', res);
             if(!res.error){
                 setItems(res.items)
             } else {
                 console.log(res.error)
+            }
+        })
+
+        socket.on("updated", (res) => {
+            if (!res.err) {
+                console.log('updated user inventory: ', res);
+                setInventory(res.inventory)
             }
         })
 
@@ -51,27 +65,23 @@ export default function Garden () {
             socket.off('garden:update');
             socket.off('garden:delete');
             socket.off('garden:add');
+            socket.off('updated');
         }    
     }, [])
 
-
-    function refresh() {
-        console.log(items)
-    }
-    useEffect(() => refresh(), [items])
-
-    console.log(`current items: `, items);
-
     return (
-        // <Layout loggedIn={true}>
-            <div className="garden-page-container">
-                <div className='plot'>
-                    <Plot positions={items} gardenId={gardenId} userId={user}/>
+        <Layout loggedIn={true}>
+            <div id="garden-page-container">
+                <div className='left-els'>
+                    <h1 className='title'>{name}</h1>
+                    <div className='plot'>
+                        <Plot positions={items} gardenId={gardenId} userId={user}/>
+                    </div>
                 </div>
-                <div className='inventory'>
-                    <Inventory gardenId={gardenId} userId={user} />
+                <div id='inventory'>
+                    <Inventory gardenId={gardenId} inventory={inventory} userId={user} />
                 </div>
             </div>
-        // </Layout>
+        </Layout>
     );
 }
