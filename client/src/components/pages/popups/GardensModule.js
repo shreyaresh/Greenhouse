@@ -20,7 +20,7 @@ export default function GardensModule({gardens}) {
         e.preventDefault();
         get('/api/garden-status', {gardenId : gardenId}).then((res) => {
             if (res.msg === "Garden already initialized"){
-                navigate('/garden', {gardenId: gardenId})
+                navigate('/garden', {state: {gardenId: gardenId}})
             } 
             if (res.msg === "Wait for your partner to select a plant") {
                 setGreyedOut({grey: true, message: res.msg})

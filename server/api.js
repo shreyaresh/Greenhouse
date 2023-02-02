@@ -42,6 +42,11 @@ router.get('/currency', (req, res) => {
   .then((result) => {return res.send({currency : result.currency})})
 })
 
+router.get('/items', (req, res) => {
+  User.findById(req.user._id)
+  .then((result) => {return res.send(result.inventory)})
+})
+
 router.get("/is-verified", (req, res) => {
   let truth = User.findOne({ email: req.query.email})
               .then((res) => truth = ((res) ? true: false))
@@ -142,7 +147,7 @@ router.get("/all-gardens", async (req, res) => {
   });
 
 router.get("/garden", async (req, res) => {
-    return res.status(200).send(await Garden.findById(req.body.gardenId));
+    return res.status(200).send(await Garden.findById(req.query.gardenId));
 });
 
 

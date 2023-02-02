@@ -11,9 +11,11 @@ import { socket } from '../client-socket';
 export default function Navbar({loggedIn}) {
     const [success, setSuccess] = useState(false);
     const [clicked, setClicked] = useState(false);
-    const [currency, setCurrency] = useState(0)
+    const [currency, setCurrency] = useState(0);
+    const [name, setName] = useState('');
     const navigate = useNavigate();
-  
+
+
     function logout(e) {
         googleLogout();
         post("/api/logout").then((res) => {
@@ -32,10 +34,13 @@ export default function Navbar({loggedIn}) {
         }
 
     useEffect(() => {
+        if (loggedIn) {
         get('/api/currency').then(
             (res) => setCurrency(res.currency)
         )
-    }, [])
+        get('/api/whoami')
+        .then((res) => setName(res.name))
+    }}, [])
 
     socket.on("updated", function (res) {
         if (!(res.err)) {
@@ -60,16 +65,17 @@ export default function Navbar({loggedIn}) {
             </a>
             
             <div className="links">
-            {loggedIn ? <img src={NotifIcon} alt='notification icon' className='logo' onClick={loadNotifs}></img> : null}
             {(loggedIn) ? <div className="currency">
             <img src={coin} alt="coin"></img>
             {currency}
             </div>: null}
-            {loggedIn ? ['Dashboard','Friends','Profile'].map(el => {
+            {loggedIn ? <img src={NotifIcon} alt='notification icon' className='logo' onClick={loadNotifs}></img> : null}
+            {loggedIn ? ['Dashboard','Friends'].map(el => {
                 return(
                     <a className="link" key={el} href={`/${el.toLowerCase()}`}>{el}</a>
                 )
             }) : null }
+            {loggedIn ? <p style={{fontWeight : "600", color:"#52671a"}}>{name}</p> : null}
             {loggedIn ? <a className="link" href="/" onClick={logout}>Logout</a> : null}
             </div>
         </div>

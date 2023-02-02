@@ -72,6 +72,7 @@ export default function FriendModal({ friend, friendId }) {
                             )
                         })}
                     </div>
+                    // TO DO : INSERT FUNCTIONS
                     <button className='modal-submit'>send a garden request</button>
                     <button className='modal-submit'>delete {friend}</button>
                 </div>

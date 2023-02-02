@@ -62,7 +62,8 @@ const App = () => {
                     <Route path="/friends" element={<Friends/>}/>
                     <Route path="/create-garden" element={<CreateGarden />} />
                     <Route path="/create-garden/:garden" element={<CreateGarden/>} />
-                    {/* <Route path="/garden/:id" element={<Garden/>}/> */}
+                    <Route path="/garden" element={<Garden/>}/>
+                    <Route path="/garden/:id" element={<Garden/>}/>
                 </Route>
             
                 <Route path="*" element={<NotFound/>}/>

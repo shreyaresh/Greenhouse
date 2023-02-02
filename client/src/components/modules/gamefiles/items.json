@@ -1,0 +1,107 @@
+{"8b494f1f-aa63-4134-a2fa-f6f07216a448": [{
+    "growthStage": 1,
+    "img-garden": "/justPlanted",
+    "img-inventory": "/seeds"
+    },{
+    "growthStage": 2,
+    "img-garden": "../public/growthStage-1-hyacinth.png",
+    "img-inventory": "../public/growthStage-1-hyacinth.png"
+    },{
+    "growthStage": 3,
+    "img-garden": "../public/growthStage-2-hyacinth.png",
+    "img-inventory": "../public/growthStage-2-hyacinth.png"
+    },{
+    "growthStage": 4,
+    "img-garden": "../public/growthStage-3-hyacinth.png",
+    "img-inventory": "../public/growthStage-3-hyacinth.png"
+    }, {
+    "growthStage": 5,
+    "img-garden": "../public/hyacinth.png",
+    "img-inventory": "../public/hyacinth.png"
+    }
+    ],
+ "ec881025-65a7-4494-8035-c75983813db7": [{
+    "growthStage": 1,
+    "img-garden": "/justPlanted",
+    "img-inventory": "/seeds"
+    },{
+    "growthStage": 2,
+    "img-garden": "../public/growthStage-1-grass.png",
+    "img-inventory": "../public/growthStage-1-grass.png"
+    },{
+    "growthStage": 3,
+    "img-garden": "../public/growthStage-2-grass.png",
+    "img-inventory": "../public/growthStage-2-grass.png"
+    },{
+    "growthStage": 4,
+    "img-garden": "../public/growthStage-3-grass.png",
+    "img-inventory": "../public/growthStage-3-grass.png"
+    }, {
+    "growthStage": 5,
+    "img-garden": "../public/grass.png",
+    "img-inventory": "../public/grass.png"
+    }],
+ "e0fd2b8a-3585-4380-ba79-d5ca524fdebe": [{
+    "growthStage": 1,
+    "img-garden": "/justPlanted",
+    "img-inventory": "/seeds"
+    },{
+    "growthStage": 2,
+    "img-garden": "../public/growthStage-1-hyacinth.png",
+    "img-inventory": "../public/growthStage-1-sunflower.png"
+    },{
+    "growthStage": 3,
+    "img-garden": "../public/growthStage-2-hyacinth.png",
+    "img-inventory": "../public/growthStage-2-sunflower.png"
+    },{
+    "growthStage": 4,
+    "img-garden": "../public/growthStage-3-hyacinth.png",
+    "img-inventory": "../public/growthStage-3-sunflower.png"
+    }, {
+    "growthStage": 5,
+    "img-garden": "../public/sunflower.png",
+    "img-inventory": "../public/sunflower.png"
+    }],
+   "5540a077-31bd-41de-8ef1-da91b7dbb289": [{
+   "growthStage": 1,
+   "img-garden": "/justPlanted",
+   "img-inventory": "/seeds"
+   },{
+   "growthStage": 2,
+   "img-garden": "../public/growthStage-1-grass.png",
+   "img-inventory": "../public/growthStage-1-grass.png"
+   },{
+   "growthStage": 3,
+   "img-garden": "../public/growthStage-2-grass.png",
+   "img-inventory": "../public/growthStage-2-grass.png"
+   },{
+   "growthStage": 4,
+   "img-garden": "../public/growthStage-3-grass.png",
+   "img-inventory": "../public/growthStage-3-grass.png"
+   }, {
+   "growthStage": 5,
+   "img-garden": "../public/hydrangeas.png",
+   "img-inventory": "../public/hydrangeas.png"
+   }],
+   "68e272d4-caa1-416d-85b6-dbfd01c97f16": [{
+      "growthStage": 1,
+      "img-garden": "/justPlanted",
+      "img-inventory": "/seeds"
+      },{
+      "growthStage": 2,
+      "img-garden": "../public/growthStage-1-grass.png",
+      "img-inventory": "../public/growthStage-1-grass.png"
+      },{
+      "growthStage": 3,
+      "img-garden": "../public/growthStage-2-grass.png",
+      "img-inventory": "../public/growthStage-2-grass.png"
+      },{
+      "growthStage": 4,
+      "img-garden": "../public/growthStage-3-grass.png",
+      "img-inventory": "../public/growthStage-3-grass.png"
+      }, {
+      "growthStage": 5,
+      "img-garden": "../public/lilies.png",
+      "img-inventory": "../public/lilies.png"
+      }]
+}

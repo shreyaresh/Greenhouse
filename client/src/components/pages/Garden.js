@@ -1,120 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import Layout from '../Layout';
+import React, {useEffect, useState} from 'react';
 import { get, post } from '../../utilities';
-import { useNavigate , useParams} from 'react-router-dom';
-import { socket } from "../../client-socket";
-import $ from "jquery";
+import { Plot, observe } from '../modules/gamefiles/Plot.js';
+import { useLocation } from 'react-router-dom';
+import { Inventory } from '../modules/gamefiles/Inventory.js';
+import Layout from '../Layout.js';
+import { socket } from '../../client-socket.js';
 
-export default function Garden(props) {
+export default function Garden () {
 
-    const gardenObj = post("/api/garden", { gardenId: props.gardenId }).then((res) => {gardenObj = res;});
-    const startUser = post("/api/whoami").then((res) => {startUser = res;});
-    const [isConnected, setIsConnected] = useState(socket.connected);
-    const [garden, setGarden] = useState(gardenObj);
-    const [user, setUser] = useState(startUser);
-    const [item, setItem] = useState(null);
+    const gardenId = useLocation().state.gardenId;
+    const [items, setItems] = useState([])
+    const [user, setUser] = useState({})
+    const [timer, setTimer] = useState(new Date());
 
     useEffect(() => {
-        socket.join(props.gardenId);
-        socket.on("updated", (res) => {
-            if (!("error" in res) && !res.error) {
-                setUser(res)
-            }});
-        socket.on("garden:update", (res) => {
-            if (!("error" in res) && !res.error) {
-                setGarden(res)
-            }});
-        socket.on("garden:delete", (res) => {
-            if (!("error" in res) && !res.error) {
-                setGarden(res)
-            }});
-        socket.on("garden:add", (res) => {
-            if (!("error" in res) && !res.error) {
-                setGarden(res)
-            }});
-
-        () => {
-            socket.leave(props.gardenId)
-        }
-        });
-
-    // item object, position in Array
-    function releaseItemInGarden (item, newPosition) {
-        const new_pos_x = newPosition[0], new_pos_y = newPosition[1];
-
-        if (item.position_x && item.position_y) {
-            socket.emit("garden:update", {
-                gardenId: props.gardenId,
-                userId: item.userId,
-                growthTime: item.growthTime,
-                old_position_x: item.position_x,
-                old_position_y: item.position_y,
-                position_x: new_pos_x,
-                position_y: new_pos_y,
-                item_id: item.item_id,
-                growthStage: item.growthStage
-              });
-            }
-        if (Math.abs(+new_pos_x) < 4 && Math.abs(+new_pos_y) < 4) {
-            socket.emit("garden:add", {
-                gardenId: props.gardenId,
-                userId: String(startUser._id),
-                growthTime: item.growthTime,
-                position_x: new_pos_x,
-                position_y: new_pos_y,
-                item_id: item.item_id,
-
-              })};
-        }
-    }
-    
-    function releaseItemInInventory (item) {
-        socket.emit("garden:delete", {
-            gardenId: props.gardenId,
-            userId: item.userId,
-            userIdCurrent: String(startUser._id),
-            growthTime: item.growthTime,
-            position_x: item.position_x,
-            position_y: item.position_y,
-            item_id: item.item_id,
-            growthStage: item.growthStage
-          });
-
-    <div className='Garden'>
-        <div className="parent">
-            <div className="garden-plot">
-            </div>
-            <div className="frame">
-            </div>
-        </div>
-    </div>
-    // <Inventory />
-    
-    
+        socket.emit("join", {roomId: gardenId})
+        get('/api/whoami')
+        .then((res) => setUser(res._id))
+        get('/api/garden', {gardenId : gardenId})
+        .then((res) => setItems(res.items))
+        return (() => socket.emit("leave", {roomId: gardenId}))
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        }
+    }, [])
 
+    // useEffect(()=>{
+    //     observe((res) => setItems(res))
+    // }, [])
 
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //        setTimer(new Date());
+    //     }, 500);
+     
+    //     return () => clearInterval(interval);
+     
+    //  }, [])
+
+    useEffect(() => {
+        socket.on("garden:add", (res) => {
+            if(!res.error){
+                setItems(res.items)
+            } else {
+                console.log(res.error)
+            }
+        })
+    
+        socket.on("garden:update", (res) => {
+            if(!res.error){
+                console.log('success: ', res.items)
+                setItems(res.items)
+            } else {
+                console.log(res.error)
+            }
+        })
+    
+        socket.on("garden:delete", (res) => {
+            if(!res.error){
+                setItems(res.items)
+            } else {
+                console.log(res.error)
+            }
+        })    
+    }, [])
+
+    console.log(`current items: `, items);
+
+    return (
+            <div className="garden-page-container">
+                <div className='plot'>
+                    <Plot positions={items} gardenId={gardenId} userId={user}/>
+                </div>
+                <div className='inventory'>
+                    <Inventory gardenId={gardenId} userId={user} />
+                </div>
+            </div>
+    );
+}

@@ -35,7 +35,6 @@ async function gardenItemUpdate (payload) {
   const gardenSchema = Joi.object({
     gardenId: Joi.string(),
     userId: Joi.string(),
-    growthTime: Joi.number(),
     old_position_x: Joi.number(),
     old_position_y: Joi.number(),
     position_x: Joi.number(),
@@ -50,10 +49,10 @@ async function gardenItemUpdate (payload) {
   });
 
   if (error) {
-    return callback({
+     return {
       error: "Invalid payload.",
       errorDetails: error.details,
-    });
+    };
   }
   // check if another item exists at location
   try{
@@ -61,34 +60,35 @@ async function gardenItemUpdate (payload) {
     position_x: payload.old_position_x,
     position_y: payload.old_position_y  
   }}});
-  } catch {
-    return callback({
-      error: "Unable to query for existing item.",
-    });
-  }
-
+  
   if (alrExists) {
-    return callback({
+    return {
       error: "Item already exists at location."
-    })
+    }
+    }
+  } catch {
+    return {
+      error: "Unable to query for existing item.",
+    };
   }
 
   try{
-  const updatedGarden =  await Garden.findByIdAndUpdate(payload.gardenId,
+  const updatedGarden =  await Garden.findOneAndUpdate({_id: payload.gardenId},
     { $set : {"items.$[item].position_x": payload.position_x, "items.$[item].position_y": payload.position_y }}, 
     {arrayFilters: [{
-      "item.item_id": item_id,
+      "item.item_id": payload.item_id,
       "item.position_x": payload.old_position_x,
       "item.position_y": payload.old_position_y
     }]},
-    {new:true}
+    {new: true}
   );
-    socket.to(payload.gardenId).emit('garden:update', updatedGarden);
-
+  console.log(`updated: `, updatedGarden);
+  console.log("here")
+  socket.to(payload.gardenId).emit('garden:update', updatedGarden);
   } catch {
-    return callback({
+    return {
       error: "Unable to query and update item."
-    });
+    };
   }
 }
 
@@ -110,10 +110,10 @@ async function gardenItemAdd(payload) {
   });
 
   if (error) {
-    return callback({
+    return {
       error: "Invalid payload.",
       errorDetails: error.details,
-    });
+    };
   } 
   // check if another item exists at location
   try {
@@ -121,17 +121,18 @@ async function gardenItemAdd(payload) {
     position_x: payload.position_x,
     position_y: payload.position_y  
   }}});
+    if (alrExists) {
+      return {
+        error: "Item already exists at location.",
+        errorDetails: error.details,
+      };
+    }
   } catch {
-    return callback({
+    return {
       error: "Unable to query for item.",
-    });
+    };
   }
-  if (alrExists) {
-    return callback({
-      error: "Item already exists at location.",
-      errorDetails: error.details,
-    });
-  }
+
 
   try {
     const doNotOwn  = await User.findOne({_id : payload.userId, items: {$elemMatch: {
@@ -140,17 +141,20 @@ async function gardenItemAdd(payload) {
       growthStage: payload.growthStage,
       quantity: {$lt: 1}
     }}});
-    } catch {
-      return callback({
-        error: "Unable to query for item.",
-      });
-    }
+
     if (doNotOwn) {
-      return callback({
+      return {
         error: "You do not own this item.",
         errorDetails: error.details,
-      });
+      };
     }
+
+    } catch {
+      return {
+        error: "Unable to query for item.",
+      };
+    }
+   
 
   // to consider: user can take an item out and essentially reset growth time periodically
   try {
@@ -171,13 +175,13 @@ async function gardenItemAdd(payload) {
       {new:true}); 
       socket.to(payload.gardenId).emit('garden:add', updatedGarden);
   } catch {
-    return callback({
+    return {
       error: "Unable to query and update for new item.",
-    });
+    };
   }
 }
 
-async function gardenItemDelete (payload, res) {
+async function gardenItemDelete (payload) {
   const socket = this;
   const gardenSchema = Joi.object({
     gardenId: Joi.string(),
@@ -196,16 +200,16 @@ async function gardenItemDelete (payload, res) {
   });
 
   if (error) {
-    return callback({
+    return {
       error: "Invalid payload.",
       errorDetails: error.details,
-    });
+    };
   } 
 
   if (payload.userId !== payload.userIdCurrent) {
-    return callback({
+    return {
       err: "This plant belongs to your partner!"
-    })
+    }
   };
 
   try{
@@ -218,9 +222,9 @@ async function gardenItemDelete (payload, res) {
     socket.emit("updated", {userId: payload.userId});
     socket.to(payload.gardenId).emit('garden:delete', updatedDoc);
   } catch {
-    return callback({
+    return {
       err: "Unable to query and update item."
-    })
+    }
   }
 }
 
@@ -237,6 +241,12 @@ module.exports = {
     io.on("connection", (socket) => {
 
       console.log(`socket has connected ${socket.id}`);
+      socket.on("join", (roomId) => {
+        socket.join(roomId.roomId)
+      })
+      socket.on("leave", (roomId) => {
+        socket.leave(roomId.roomId)
+      })
       socket.on("garden:update", gardenItemUpdate);
       socket.on("garden:add", gardenItemAdd);
       socket.on("garden:delete", gardenItemDelete);

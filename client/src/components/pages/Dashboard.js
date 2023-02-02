@@ -7,7 +7,6 @@ import FriendsModule from './popups/FriendsModule';
 import GardensModule from './popups/GardensModule';
 
 
-
 export default function Dashboard({handleLogout}) {
     const [userInfo, setUserInfo] = useState({});
     const [email, setEmail] = useState('');
@@ -62,7 +61,6 @@ export default function Dashboard({handleLogout}) {
     useEffect(() => {
         socket.on("updated", function (res) {
             if (!(res.err)) {
-                console.log('system update: ', res.friends)
                 setFriends(res.friends);
                 get('/api/all-gardens').then((res) => {
                     setGardens(res)
