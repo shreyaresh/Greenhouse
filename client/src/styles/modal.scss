@@ -1,0 +1,61 @@
+#m {
+    height: 100%;
+    width: 100%;
+
+
+    .modal-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height:100%;
+    width: 100%;
+    background-color:$yellow;
+    cursor: pointer;
+    border-style: none;
+    color: $greenest;
+    border-radius:10px;
+    font-size: 1.3rem;
+    &:hover {
+        background-color: $greener;
+        }
+    }
+ 
+  .modal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $pastel-green;
+    border-radius: 25px;
+    border: solid 5px $green;
+    }
+
+  .header {
+    display:flex;
+    justify-content: flex-end;
+    padding: 10px;
+    position: relative;
+    border-bottom: solid 2px $green;
+    }
+  
+  .close {
+    display: flex;
+    width: 20px;
+    height: 20px;
+    border-radius: 25px;
+    background: none;
+    align-items: center;
+    justify-content: center;
+    img {
+        width: 100%;
+        height: 100%;
+      }
+    &:hover {
+        opacity: 0.6;
+      }
+    }
+  
+  .content {
+    padding: 10px;
+    }
+}

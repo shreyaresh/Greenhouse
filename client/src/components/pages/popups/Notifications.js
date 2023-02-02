@@ -6,7 +6,7 @@ import { socket } from  '../../../client-socket';
 export default function Notifications(props) {
   
     const [notifications, setNotifications] = useState([]);
-    const [long, setLong] = useState(false)    
+    const [long, setLong] = useState(true)    
 
     useEffect (() => {
         get('/api/notifications').then((res) => {
@@ -18,15 +18,14 @@ export default function Notifications(props) {
         }).catch((err) => console.log(err));
     })
 
+    socket.on("updated", function (res) {
+        if (!(res.err)) {
+            setNotifications(res.notifications);
+    }})
+
     useEffect(() => {
-        socket.on("updated", function (res) {
-            if (!(res.err)) {
-                setNotifications(res.notifications);
-        }});
-        return () => {
-            socket.removeAllListeners();
-        }
-    }, [socket]);
+        return (() => {socket.removeAllListeners()})
+    }, [])
 
 
     function dateParser(dateString) {

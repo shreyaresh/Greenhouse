@@ -37,6 +37,11 @@ router.post('/get-verify-code', async (req, res) => {
      return res.send({err: "Email is not registered yet."});
     }
 );
+router.get('/currency', (req, res) => {
+  User.findById(req.user._id)
+  .then((result) => {return res.send({currency : result.currency})})
+})
+
 router.get("/is-verified", (req, res) => {
   let truth = User.findOne({ email: req.query.email})
               .then((res) => truth = ((res) ? true: false))
