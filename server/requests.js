@@ -161,7 +161,6 @@ async function gardensWith (req, res) {
         if (you.gardenIds.length){
             for (const gardenId of you.gardenIds) {
                 const gardenObj = await Garden.findById(gardenId);
-                console.log(`obj: ${gardenObj}`);
                 if (gardenObj.userIds.includes(String(friend))) {
                     gardensWithFriend.push([gardenObj._id, gardenObj.name, gardenObj.dateCreated, gardenObj.isVerified, gardenObj.lastVisited]);
                 }

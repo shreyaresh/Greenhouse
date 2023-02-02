@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import { get, post } from '../../utilities';
-import { Plot, observe } from '../modules/gamefiles/Plot.js';
+import { get } from '../../utilities';
+import { Plot } from '../modules/gamefiles/Plot.js';
 import { useLocation } from 'react-router-dom';
 import { Inventory } from '../modules/gamefiles/Inventory.js';
 import Layout from '../Layout.js';
@@ -11,32 +11,17 @@ export default function Garden () {
     const gardenId = useLocation().state.gardenId;
     const [items, setItems] = useState([])
     const [user, setUser] = useState({})
-    const [timer, setTimer] = useState(new Date());
 
     useEffect(() => {
+
         socket.emit("join", {roomId: gardenId})
+
         get('/api/whoami')
         .then((res) => setUser(res._id))
+        
         get('/api/garden', {gardenId : gardenId})
         .then((res) => setItems(res.items))
-        return (() => socket.emit("leave", {roomId: gardenId}))
-        
-    }, [])
 
-    // useEffect(()=>{
-    //     observe((res) => setItems(res))
-    // }, [])
-
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //        setTimer(new Date());
-    //     }, 500);
-     
-    //     return () => clearInterval(interval);
-     
-    //  }, [])
-
-    useEffect(() => {
         socket.on("garden:add", (res) => {
             if(!res.error){
                 setItems(res.items)
@@ -47,7 +32,6 @@ export default function Garden () {
     
         socket.on("garden:update", (res) => {
             if(!res.error){
-                console.log('success: ', res.items)
                 setItems(res.items)
             } else {
                 console.log(res.error)
@@ -60,12 +44,26 @@ export default function Garden () {
             } else {
                 console.log(res.error)
             }
-        })    
+        })
+
+        return () => {
+            socket.emit("leave", {roomId: gardenId});
+            socket.off('garden:update');
+            socket.off('garden:delete');
+            socket.off('garden:add');
+        }    
     }, [])
+
+
+    function refresh() {
+        console.log(items)
+    }
+    useEffect(() => refresh(), [items])
 
     console.log(`current items: `, items);
 
     return (
+        // <Layout loggedIn={true}>
             <div className="garden-page-container">
                 <div className='plot'>
                     <Plot positions={items} gardenId={gardenId} userId={user}/>
@@ -74,5 +72,6 @@ export default function Garden () {
                     <Inventory gardenId={gardenId} userId={user} />
                 </div>
             </div>
+        // </Layout>
     );
 }

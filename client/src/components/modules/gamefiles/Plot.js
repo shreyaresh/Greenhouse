@@ -29,8 +29,8 @@ function renderPosition(i, items) {
     socket.emit("garden:update", {
         gardenId: gardenId,
         userId: userId,
-        old_position_x: items[idx].position_y,
-        old_position_y: items[idx].position_x,
+        old_position_x: items[idx].position_x,
+        old_position_y: items[idx].position_y,
         position_x: x,
         position_y: y,
         item_id: item.item_id,

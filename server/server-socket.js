@@ -2,7 +2,6 @@ let io;
 const Joi = require("joi");
 const Garden = require("./models/garden");
 const User = require("./models/user");
-const { FriendRequest } = require('./models/request');
 
 const userToSocketMap = {}; // maps user ID to socket object
 const socketToUserMap = {}; // maps socket ID to user object
@@ -31,7 +30,7 @@ const removeUser = (user, socket) => {
 
 // move from one location to another
 async function gardenItemUpdate (payload) {
-  const socket = this;
+  const io = this;
   const gardenSchema = Joi.object({
     gardenId: Joi.string(),
     userId: Joi.string(),
@@ -57,8 +56,8 @@ async function gardenItemUpdate (payload) {
   // check if another item exists at location
   try{
   const alrExists  = await Garden.findOne({_id : payload.gardenId, items: {$elemMatch: {
-    position_x: payload.old_position_x,
-    position_y: payload.old_position_y  
+    position_x: payload.position_x,
+    position_y: payload.position_y  
   }}});
   
   if (alrExists) {
@@ -74,17 +73,17 @@ async function gardenItemUpdate (payload) {
 
   try{
   const updatedGarden =  await Garden.findOneAndUpdate({_id: payload.gardenId},
-    { $set : {"items.$[item].position_x": payload.position_x, "items.$[item].position_y": payload.position_y }}, 
-    {arrayFilters: [{
+    { $set : {"items.$[item].position_x": payload.position_x, "items.$[item].position_y": payload.position_y}}, 
+    {arrayFilters: [{ 
       "item.item_id": payload.item_id,
-      "item.position_x": payload.old_position_x,
-      "item.position_y": payload.old_position_y
-    }]},
-    {new: true}
-  );
-  console.log(`updated: `, updatedGarden);
-  console.log("here")
-  socket.to(payload.gardenId).emit('garden:update', updatedGarden);
+     "item.position_x": payload.old_position_x,
+     "item.position_y": payload.old_position_y
+      }],
+    new: true,
+    useFindAndModify: false});
+    console.log("garden updated: ", updatedGarden);
+    return { msg : "Success!", doc : updatedGarden};
+
   } catch {
     return {
       error: "Unable to query and update item."
@@ -242,21 +241,31 @@ module.exports = {
 
       console.log(`socket has connected ${socket.id}`);
       socket.on("join", (roomId) => {
+        console.log('joined room ', roomId.roomId);
         socket.join(roomId.roomId)
       })
       socket.on("leave", (roomId) => {
         socket.leave(roomId.roomId)
       })
-      socket.on("garden:update", gardenItemUpdate);
-      socket.on("garden:add", gardenItemAdd);
-      socket.on("garden:delete", gardenItemDelete);
+
+      socket.on("garden:update", async (payload) => {
+        res = await gardenItemUpdate(payload)
+        if (res.doc) {
+          console.log(res.msg)
+          io.in(payload.gardenId).emit('garden:update', res.doc);
+        } else {
+          console.log(res.err)
+        }
+      });
+      socket.on("garden:add", async (payload) => {await gardenItemAdd(payload)});
+      socket.on("garden:delete", async (payload) => {await gardenItemDelete(payload)});    
+  
+
       socket.on("disconnect", (reason) => {
         const user = getUserFromSocketID(socket.id);
         removeUser(user, socket);
       });
     });
-
-    
   },
 
   addUser: addUser,

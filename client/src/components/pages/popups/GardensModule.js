@@ -34,6 +34,10 @@ export default function GardensModule({gardens}) {
     useEffect(() => {
         get('/api/friends')
         .then((res) => {setFriends(res); setFilteredResults(res)})
+
+        return (() => {
+            clearTimeout(timeout)
+        })
     }, [])
 
 
@@ -53,7 +57,7 @@ export default function GardensModule({gardens}) {
     }
 
 
-    setTimeout(()=> setGreyedOut({grey: false, message:''}), 5000);
+    const timeout = setTimeout(()=> setGreyedOut({grey: false, message:''}), 5000);
 
     return(
        <div id = 'gardensModule'>
