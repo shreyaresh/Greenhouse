@@ -26,12 +26,12 @@ async function makeRequest (req, res) {
 
     if (!req.user) {
         console.log('failed at login')
-        return res.status(400).send({err: "Must be logged in."})
+        return res.send({err: "Must be logged in."})
     }
     // don't add yourself
     if (req.user.name === req.body.to) {
         console.log('self add')
-        return res.status(400).send({err: "You cannot add yourself!"})
+        return res.send({err: "You cannot add yourself!"})
     };
 
     const from_id = req.user._id;
@@ -42,16 +42,16 @@ async function makeRequest (req, res) {
 
         if (await requestType.findOne({userIdFrom: from_id, userIdTo: recipient._id})){
             console.log('req sent')
-            return res.status(400).send({ err: `Already sent request!`})
+            return res.send({ err: `Already sent request!`})
         }
 
         if (req.body.type === "friend-request" &&  await User.findOne({_id : from_id, "friends.username": req.body.to})) {
             console.log('alr friends')
-            return res.status(400).send({ err: 'Already friends with this user.' })
+            return res.send({ err: 'Already friends with this user.' })
         }
         if (req.body.type === "garden-request" && !(await User.findOne({_id : from_id, "friends.username": req.body.to}))){
             console.log('not friends')
-            return res.status(400).send({err : "Not friends with this user."})
+            return res.send({err : "Not friends with this user."})
         }
     
         const id_type = ((req.body.type === 'friend-request') ? 'friendReqId' : 'gardenReqId');

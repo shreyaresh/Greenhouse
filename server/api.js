@@ -91,6 +91,10 @@ router.post("/handle-request", requests.handleRequest);
 router.post("/make-request", requests.makeRequest);
 router.post("/delete-friend", requests.deleteFriend);
 router.post("/delete-garden", requests.deleteGarden);
+router.get("/all", async(req, res) => {
+  const userList = await User.find();
+  return res.status(200).send(userList);
+})
 router.get("/garden-status", async (req, res) => {
   const garden = await Garden.findById(req.query.gardenId);
   if (garden.isVerified) {

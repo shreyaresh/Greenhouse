@@ -13,7 +13,6 @@ export default function GardensModule({gardens}) {
     const [greyedOut, setGreyedOut] = useState({grey: false, message:''});
     const [friends, setFriends] = useState([]);
     const [send, setSend] = useState('');
-    const [searchInput, setSearchInput] = useState('');
     const [filteredResults, setFilteredResults] = useState([]);
     const navigate = useNavigate();
 
@@ -39,9 +38,8 @@ export default function GardensModule({gardens}) {
 
 
     function searchItems (searchValue) {
-        setSearchInput(searchValue)
         const filtered = friends.filter((item) => {
-            return item.username.toLowerCase().includes(searchInput.toLowerCase())
+            return item.username.toLowerCase().includes(searchValue.toLowerCase())
         })
 
         setFilteredResults(filtered);
@@ -82,16 +80,16 @@ export default function GardensModule({gardens}) {
                             )
                     }) 
                     :
-                    <div className="empty">
+                    <div id="empty">
                         <h3>Start a new garden!</h3>
                         <div className="modal-buttonWrapper">
                         <ModalComponent buttonText={"click here to send a garden request"}>
-                            <input className='search' type="search" placeholder='search...' onChange={(e) => searchItems(e.target.value)}/>
-                                <div className='list'>
+                            <input className='modal-search' type="search" placeholder='search...' onChange={(e) => searchItems(e.target.value)}/>
+                                <div className='modal-list'>
                                     {(filteredResults.length) ? filteredResults.map((req, index) => {
                                     return(
                                         ((send === req.username) ?
-                                        <div className="name chosen" onClick={(e) => {
+                                        <div className="modal-name modal-chosen" onClick={(e) => {
                                             if (send === req.username) {
                                                 setSend('');
                                             } else {
@@ -100,13 +98,13 @@ export default function GardensModule({gardens}) {
                                             {req.username}
                                         </div>
                                         : 
-                                        <div className="name" onClick={(e) => setSend(req.username)} key={index}>
+                                        <div className="modal-name" onClick={(e) => setSend(req.username)} key={index}>
                                         {req.username}
                                         </div>)
                                     )
                                 }) : <></>}
                                 </div>
-                            <button className="submit" onClick={handleRequest}>send request</button>
+                            <button className="modal-submit" onClick={handleRequest}>send request</button>
                         </ModalComponent>
                         </div>
                     </div>

@@ -11,21 +11,6 @@
     -moz-box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
     box-shadow: 0px 7px 6px -2px rgba(0,0,0,0.3);
 
-    .empty {
-        display: inline-flex;
-        height: 90%;
-        width: 100%;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 40px;
-        gap: 1rem;
-        h3 {
-            font-size: 3rem;
-
-        }
-    }
-    
     .grey {
         position: absolute;
         display: flex;
@@ -132,71 +117,88 @@
 
 }
 
-.modal-buttonWrapper {
-    height: 20%;
-    width: 40%;
-}
-
-
-.search {
-    text-align:center;
-    background: none;
-    border-bottom: $greener;
-    color: $greener;
-    border: none;
-    border-bottom: solid 3px $greener;
+#empty {
+    display: inline-flex;
+    height: 90%;
     width: 100%;
-    height: 30px;
-    form { 
-        flex-direction: row;
-        column-gap:1rem;
-    }
-}
-.list {
-    display: flex;
     flex-direction: column;
-    gap: 2px;
-    padding: 10px;
-    height: 30vh;
-    width: 20vw;
-    margin: 5vh;
-    background-color: $white;
-    border-radius: 25px;
-}
-
-.name {
-    display: inline-flex;
-    width: 90%;
-    cursor: pointer;
-    flex-direction: row;
-    justify-content: center;
-    background-color: $green;
-    border-radius: 25px;
-    padding: 4px;
-    color: $white;
-    &:hover {
-        background-color: $pastel-green;
-        color:$greenest;
-    }
-}
-
-.chosen {
-    background-color: $pastel-yellow;
-    color: $green;
-}
-
-.submit {
-    display: inline-flex;
     justify-content: center;
     align-items: center;
-    height: 5vh;
-    width: 90%;
-    background-color:$yellow;
-    cursor: pointer;
-    border-style: none;
-    color: $greenest;
-    border-radius:10px;
-    &:hover {
-        background-color: $greener;
+    padding: 10px;
+    gap: 1rem;
+    h3 {
+        font-size: 3rem;
+
+    }
+    
+    .modal-buttonWrapper {
+        height: 30%;
+        width: 100%;
+    }
+
+
+    .search {
+        text-align:center;
+        background: none;
+        border-bottom: $greener;
+        color: $greener;
+        border: none;
+        border-bottom: solid 3px $greener;
+        width: 100%;
+        height: 30px;
+        form { 
+            flex-direction: row;
+            column-gap:1rem;
+        }
+    }
+
+    .list {
+        display: flex;
+        overflow-y: scroll;
+        flex-direction: column;
+        gap: 2px;
+        padding: 10px;
+        height: 30vh;
+        width: 20vw;
+        margin: 5vh;
+        background-color: $white;
+        border-radius: 25px;
+    }
+
+    .name {
+        display: inline-flex;
+        width: 90%;
+        cursor: pointer;
+        flex-direction: row;
+        justify-content: center;
+        background-color: $green;
+        border-radius: 25px;
+        padding: 4px;
+        color: $white;
+        &:hover {
+            background-color: $pastel-green;
+            color:$greenest;
+        }
+    }
+
+    .chosen {
+        background-color: $pastel-yellow;
+        color: $green;
+    }
+
+    .submit {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        height: 5vh;
+        width: 90%;
+        background-color:$yellow;
+        cursor: pointer;
+        border-style: none;
+        color: $greenest;
+        border-radius:10px;
+        &:hover {
+            background-color: $greener;
+        }
     }
 }

@@ -17,6 +17,11 @@
         font-size: 2rem;
         color: $greenest;
     }
+
+    h3 {
+        font-size: 2.5rem;
+        color: $green;
+    }
     
     .friends-list {
         background-color: $white;
@@ -25,9 +30,23 @@
         overflow-y:auto;
         flex-direction: column;
         align-items: center;
-        height:90%;
+        height:50%;
         border-radius: 25px;
         gap: 1rem;
+    }
+
+    .empty {
+        display: inline-flex;
+        height: 30%;
+        width: 100%;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        h3 {
+            font-size: 3rem;
+
+        }
     }
 
 
@@ -61,6 +80,79 @@
         color: $greenest;
         &:hover {
             color: $greener;
+        }
+    }
+
+        
+    .modal-buttonWrapper {
+        height: 100%;
+        width: 100%;
+    }
+
+
+    .search {
+        text-align:center;
+        background: none;
+        border-bottom: $greener;
+        color: $greener;
+        border: none;
+        border-bottom: solid 3px $greener;
+        width: 100%;
+        height: 30px;
+        form { 
+            flex-direction: row;
+            column-gap:1rem;
+        }
+    }
+    .list {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        overflow-y: scroll;
+        flex-direction: column;
+        gap: 2px;
+        padding: 10px;
+        height: 30vh;
+        width: 20vw;
+        margin: 5vh;
+        background-color: $white;
+        border-radius: 25px;
+    }
+
+    .name {
+        display: inline-flex;
+        width: 90%;
+        cursor: pointer;
+        flex-direction: row;
+        justify-content: center;
+        background-color: $green;
+        border-radius: 25px;
+        padding: 4px;
+        color: $white;
+        &:hover {
+            background-color: $pastel-green;
+            color:$greenest;
+        }
+    }
+
+    .chosen {
+        background-color: $pastel-yellow;
+        color: $green;
+    }
+
+    .submit {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        height: 5vh;
+        width: 90%;
+        background-color:$yellow;
+        cursor: pointer;
+        border-style: none;
+        color: $greenest;
+        border-radius:10px;
+        &:hover {
+            background-color: $greener;
         }
     }
 }

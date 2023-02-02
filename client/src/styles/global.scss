@@ -39,3 +39,76 @@ a {
     text-decoration: none;
     cursor:pointer;
 }
+
+
+.modal-buttonWrapper {
+    height: 100%;
+    width: 100%;
+}
+
+
+.modal-search {
+    text-align:center;
+    background: none;
+    border-bottom: $greener;
+    color: $greener;
+    border: none;
+    border-bottom: solid 3px $greener;
+    width: 100%;
+    height: 30px;
+    form { 
+        flex-direction: row;
+        column-gap:1rem;
+    }
+}
+.modal-list {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: scroll;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px;
+    height: 30vh;
+    width: 20vw;
+    margin: 5vh;
+    background-color: $white;
+    border-radius: 25px;
+}
+
+.modal-name {
+    display: inline-flex;
+    width: 90%;
+    cursor: pointer;
+    flex-direction: row;
+    justify-content: center;
+    background-color: $green;
+    border-radius: 25px;
+    padding: 4px;
+    color: $white;
+    &:hover {
+        background-color: $pastel-green;
+        color:$greenest;
+    }
+}
+
+.modal-chosen {
+    background-color: $pastel-yellow;
+    color: $green;
+}
+
+.modal-submit {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 5vh;
+    width: 90%;
+    background-color:$yellow;
+    cursor: pointer;
+    border-style: none;
+    color: $greenest;
+    border-radius:10px;
+    &:hover {
+        background-color: $greener;
+    }
+}
