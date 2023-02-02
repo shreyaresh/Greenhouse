@@ -65,11 +65,11 @@ a {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    overflow-y: scroll;
+    overflow-y: auto;
     flex-direction: column;
     gap: 2px;
     padding: 10px;
-    height: 30vh;
+    height: 28vh;
     width: 20vw;
     margin: 5vh;
     background-color: $white;
@@ -110,5 +110,22 @@ a {
     border-radius:10px;
     &:hover {
         background-color: $greener;
+    }
+}
+
+.modal-garden {
+    background-color: $pastel-yellow;
+    color: $greener;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+
+    h3 {
+        margin:0;
+    }
+    p {
+        margin:0;
     }
 }

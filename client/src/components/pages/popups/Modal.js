@@ -9,7 +9,7 @@ export default function ModalComponent ({buttonText, children}) {
     return (
     <div id='m'>
     <button className="modal-button" onClick={() => setOpen(true)}>{buttonText}</button>
-    <ReactModal className='modal' isOpen={open} style={{ overlay: {backgroundColor : 'rgba(0,0,0,0.5)'} , content: {
+    <ReactModal className='modal' onRequestClose={() => setOpen(false)} isOpen={open} style={{ overlay: {backgroundColor : 'rgba(0,0,0,0.5)'} , content: {
     position: 'absolute',
     left: '50%',
     top: '50%',

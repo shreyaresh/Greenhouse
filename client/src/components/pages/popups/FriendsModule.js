@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import { get, post } from '../../../utilities';
 import ModalComponent from './Modal';
+import FriendModal from './FriendModal';
 
 
 export default function FriendsModule({friends}) {
@@ -11,6 +12,7 @@ export default function FriendsModule({friends}) {
     const [results, setResults] = useState([]);
     const [send, setSend] = useState('');
     const [filteredResults, setFilteredResults] = useState([]);
+    const [open, setOpen] = useState({open:false, friend:'', friendId:''})
 
     function loadAll (e) {
         if (long) {
@@ -53,6 +55,7 @@ export default function FriendsModule({friends}) {
                         return(
                             <div key={index} className='friend'>
                                 <p className="text">{req.username}</p>
+                                <FriendModal friend={req.username} friendId={req.id}/>
                             </div>
                         )
                     }) : <h3>Make a new friend!</h3>}

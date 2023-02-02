@@ -2,7 +2,7 @@ import React, { useState, useEffect} from 'react';
 import Layout from '../Layout';
 import { get, post } from '../../utilities';
 import { socket } from '../../client-socket';
-import x from '../../public/x.png';
+import FriendModal from './popups/FriendModal';
 
 export default function Friends() {
     const [friendName, setFriendName] = useState('');
@@ -89,13 +89,6 @@ export default function Friends() {
         .catch(res => console.log(res))
     }
 
-    // function handleDisplay(bool) {
-    //     if (bool) {
-    //         setDisplay('displayed')
-    //     }
-    //     setDisplay('notdisplayed')
-    // }
-
     return(
         <Layout loggedIn={true}>
             <div id="friends">
@@ -113,8 +106,9 @@ export default function Friends() {
                         <h2>Friends</h2>
                         { (friends.length) ? friends.map((req, index) => {
                             return(
-                                <div className="request" key={index} onMouseEnter={(e) =>handleDisplay(true)} onMouseLeave={(e) => handleDisplay(false)}>
+                                <div className="request" key={index}>
                                     <div className="requester">{req.username}</div>
+                                    <FriendModal friend={req.username} friendId={req.id}/>
                                 </div>
                             )
                         }) : <></>}

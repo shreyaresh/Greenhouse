@@ -154,14 +154,16 @@ async function deleteGarden (req, res) {
 // returns array of the garden names, date created, verification status, and last visited shared with a friend id
 async function gardensWith (req, res) {
     let gardensWithFriend = [];
-    const friend = req.body.id;
+    const friend = req.query.id;
+    console.log(friend)
+    const you = await User.findById(req.user._id);
     if (req.user) {
-        if (req.user.gardenIds.length){
-            for (const gardenId of req.user.gardenIds) {
+        if (you.gardenIds.length){
+            for (const gardenId of you.gardenIds) {
                 const gardenObj = await Garden.findById(gardenId);
-                const friend_id  = gardenObj.userIds.filter(function (el) {return el !== String(req.user._id);})
-                if (friend_id === friend) {
-                  gardensWithFriend.push([gardenObj.name, gardenObj.dateCreated, gardenObj.isVerified, gardenObj.lastVisited]);
+                console.log(`obj: ${gardenObj}`);
+                if (gardenObj.userIds.includes(String(friend))) {
+                    gardensWithFriend.push([gardenObj._id, gardenObj.name, gardenObj.dateCreated, gardenObj.isVerified, gardenObj.lastVisited]);
                 }
             }
         }
