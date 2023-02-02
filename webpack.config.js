@@ -64,7 +64,7 @@ module.exports = {
   resolve: {
     extensions: ["*", ".js", ".jsx"],
   },
-  plugins: [new webpack.HotModuleReplacementPlugin(), new ESLintPlugin()],
+  plugins: [new webpack.HotModuleReplacementPlugin()],
   devServer: {
     historyApiFallback: true,
     static: "./client/dist",
