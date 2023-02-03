@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { socket }  from '../../client-socket';
 import FriendsModule from './popups/FriendsModule';
 import GardensModule from './popups/GardensModule';
+import RequestModule from './popups/RequestModule';
 
 
 export default function Dashboard({handleLogout}) {
@@ -78,8 +79,11 @@ export default function Dashboard({handleLogout}) {
                 <div className='friends-component'>
                     <FriendsModule friends={friends} />
                 </div>
-                <div className='gardens'>
+                <div className='right-els'>
                     <GardensModule gardens={gardens} />
+                    <div className='small-modules'>
+                        <RequestModule />
+                    </div>
                 </div>
             </div>
         </Layout>

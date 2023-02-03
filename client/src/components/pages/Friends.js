@@ -63,7 +63,7 @@ export default function Friends() {
         return () => {
             socket.removeAllListeners();
         }
-    }, [socket]);
+    }, []);
 
     function handleAction(e, status, id){
         e.preventDefault();
@@ -81,12 +81,6 @@ export default function Friends() {
         get('/api/requests', {type: 'friend-request'})
         .then(res => setRequests(res))
         .catch(res => console.log(res));
-    }
-
-    function handleDelete(username) {
-        post('/api/delete-friend', {username : username})
-        .then(get('/api/friends')).then((res) => setFriends(res))
-        .catch(res => console.log(res))
     }
 
     return(

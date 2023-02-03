@@ -14,5 +14,20 @@
         height:fit-content;
     }
 
+    .right-els {
+        display: flex;
+        flex-direction: column;
+        width: 60%;
+        gap: 20px;
+    }
+
+    .small-modules {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        width: 100%;
+        height: fit-content;
+    }
+
 
 }

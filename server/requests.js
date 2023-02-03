@@ -155,7 +155,6 @@ async function deleteGarden (req, res) {
 async function gardensWith (req, res) {
     let gardensWithFriend = [];
     const friend = req.query.id;
-    console.log(friend)
     const you = await User.findById(req.user._id);
     if (req.user) {
         if (you.gardenIds.length){

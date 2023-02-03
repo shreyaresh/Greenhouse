@@ -29,32 +29,32 @@ function Board({position, plant}) {
 
 
 
-  function Item() {
-    const [{isDragging}, drag] = useDrag(() => ({
-      type: "item",
-      collect: monitor => ({
-        isDragging: !!monitor.isDragging(),
-      }),
-    }))
-  
-    return (
-      <div
-        ref={drag}
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-          cursor: 'move',
-          width: '100%',
-          height: '100%',
-          display:'flex',
-          justifyContent: 'center',
-          padding: '2px',
-          alignItems:'flex-end'
-        }}
-      >
-      <img src={chosenMap[plant]} alt='plant'></img> 
-      </div>
-    );
-  };
+function Item() {
+  const [{isDragging}, drag] = useDrag(() => ({
+    type: "item",
+    collect: monitor => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }))
+
+  return (
+    <div
+      ref={drag}
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        cursor: 'move',
+        width: '100%',
+        height: '100%',
+        display:'flex',
+        justifyContent: 'center',
+        padding: '2px',
+        alignItems:'flex-end'
+      }}
+    >
+    <img src={chosenMap[plant]} alt='plant'></img> 
+    </div>
+  );
+};
 
 function moveItem(toX, toY) {
   itemPosition = [toX, toY];
